@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NewsLab Digital – Modul Interaktif Teks Berita Aktual dan Akurat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --outer:#dfe8fb; --paper:#eef3ff; --card:#ffffff; --ink:#27245f; --ink2:#4a4a7a; --line:#c9d3f2;
+  --navy:#2a2760; --primary:#5b2be0; --primary2:#7c4dff; --orange:#ff9f1c; --red:#e63946; --blue:#3b9ae8;
+  --ok:#1f9d55; --okbg:#dff5e8; --no:#d33a4a; --nobg:#fde3e6; --soft:#e4e9fb;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --outer:#0f0e26; --paper:#1a1941; --card:#252360; --ink:#eeecff; --ink2:#bdbbe6; --line:#3b3a86; --soft:#2f2d73;
+    --okbg:#133a27; --nobg:#4a1e28; --ok:#5fdc93; --no:#ff8b97;
+  }
+}
+:root[data-theme="dark"]{
+  --outer:#0f0e26; --paper:#1a1941; --card:#252360; --ink:#eeecff; --ink2:#bdbbe6; --line:#3b3a86; --soft:#2f2d73;
+  --okbg:#133a27; --nobg:#4a1e28; --ok:#5fdc93; --no:#ff8b97;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+html,body{margin:0;background:var(--outer)}
+body{min-height:100%;height:100%;display:grid;place-items:center;font-family:'Poppins',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--ink);
+  background:var(--outer) repeating-linear-gradient(115deg,transparent 0 22px,rgba(91,43,224,.05) 22px 24px)}
+button,input,textarea{font:inherit;color:inherit}
+a{color:var(--primary)}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+/* ===== Buku 4:5 ===== */
+.book{position:relative;width:min(100vw,calc(100vh*0.8));width:min(100vw,calc(100dvh*0.8));aspect-ratio:4/5;container-type:inline-size;
+  background:var(--paper);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 40px rgba(42,39,96,.25);border-radius:0}
+@media (min-width:700px){.book{border-radius:22px}}
+.prog{height:5px;background:var(--soft);flex:none}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--orange));transition:width .3s}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:4cqw 5.5cqw 6cqw;font-size:clamp(12.5px,3.1cqw,17px);line-height:1.55;scroll-behavior:smooth;
+  background-image:repeating-linear-gradient(115deg,transparent 0 26px,rgba(91,43,224,.04) 26px 28px)}
+.nav{flex:none;background:var(--navy);color:#fff;display:flex;align-items:center;gap:2cqw;padding:1.8cqw 3cqw;font-size:clamp(11px,2.8cqw,15px)}
+.nav button{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:999px;padding:.55em 1.1em;cursor:pointer;font-weight:600;white-space:nowrap}
+.nav button:hover:not(:disabled){background:var(--primary2)}
+.nav button:disabled{opacity:.35;cursor:default}
+.nav .mid{flex:1;text-align:center;font-weight:500;opacity:.9;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== Tipografi & komponen ===== */
+h1,h2,h3,h4{margin:0;line-height:1.15}
+.big{font-weight:800;font-size:clamp(30px,10.5cqw,70px);letter-spacing:-.02em;line-height:1.02;color:var(--navy)}
+:root[data-theme="dark"] .big,:root:not([data-theme="light"]) .big{color:var(--ink)}
+.big.p{color:var(--primary)}
+.h2{font-size:clamp(18px,5.4cqw,32px);font-weight:800;color:var(--navy);letter-spacing:-.01em}
+:root[data-theme="dark"] .h2{color:var(--ink)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .h2{color:var(--ink)}}
+.h3{font-size:1.15em;font-weight:700;margin:1.1em 0 .4em;color:var(--primary)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .h3{color:#b9a5ff}}
+:root[data-theme="dark"] .h3{color:#b9a5ff}
+.sub{font-style:italic;font-weight:700;font-size:clamp(15px,4.4cqw,26px);color:var(--ink);line-height:1.25}
+.lead{color:var(--ink2);margin:.3em 0 .8em}
+p{margin:.5em 0}
+ul,ol{padding-left:1.3em;margin:.4em 0}
+li{margin:.25em 0}
+.tab{display:inline-block;background:var(--primary);color:#fff;font-weight:700;border-radius:12px;padding:.35em 1.1em;margin:.9em 0 .5em;font-size:1.02em}
+.chip{display:inline-block;background:var(--soft);color:var(--ink);border-radius:999px;padding:.1em .75em;font-size:.82em;font-weight:600;margin:.1em .15em .1em 0}
+.dark{background:var(--navy);color:#fff;border:3px solid var(--primary);border-radius:14px;padding:.9em 1.1em;margin:.8em 0}
+.dark b{color:#ffd37a}
+.card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:.7em 1em;margin:.8em 0}
+.card.o{border-color:var(--orange);background:color-mix(in srgb,var(--orange) 12%,var(--card))}
+.card.b{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 10%,var(--card))}
+.card.g{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--card))}
+.card .t{font-weight:800;margin-bottom:.15em}
+.card.o .t{color:#d97b00}.card.b .t{color:var(--blue)}.card.g .t{color:var(--ok)}
+.btn{display:inline-block;border:0;border-radius:12px;padding:.65em 1.3em;font-weight:700;cursor:pointer;background:var(--primary);color:#fff;text-decoration:none;font-size:1em;transition:transform .12s,background .12s}
+.btn:hover{background:var(--primary2);transform:translateY(-1px)}
+.btn.red{background:var(--red);border:3px solid #ff9aa2;letter-spacing:.01em}
+.btn.red:hover{background:#ff4d5a}
+.btn.ghost{background:transparent;color:var(--primary);border:2px solid var(--primary)}
+.btn.sm{padding:.4em .9em;font-size:.88em}
+.row{display:flex;flex-wrap:wrap;gap:.5em;margin:.6em 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.6em}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.6em}
+.tbl{width:100%;border-collapse:collapse;margin:.6em 0;font-size:.93em;background:var(--card);border-radius:10px;overflow:hidden}
+.tbl th{background:var(--navy);color:#fff;padding:.5em .6em;text-align:left;font-weight:600}
+.tbl td{padding:.45em .6em;border:1px solid var(--line);vertical-align:top}
+.tbl tr:nth-child(even) td{background:color-mix(in srgb,var(--soft) 45%,var(--card))}
+.wrap{overflow-x:auto;margin:.4em 0}
+.wrap .tbl{min-width:420px}
+textarea,input[type=text]{width:100%;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:.5em .7em;resize:vertical;min-height:2.6em}
+textarea:focus,input:focus{border-color:var(--primary);outline:none}
+.tbl textarea,.tbl input[type=text]{border-width:1px;min-height:2.2em;font-size:.95em}
+.fl{display:block;font-weight:600;margin:.6em 0 .2em}
+.fl textarea,.fl input{font-weight:400;margin-top:.25em}
+.ck{display:flex;gap:.6em;align-items:flex-start;margin:.35em 0;cursor:pointer}
+.ck input{margin-top:.35em;accent-color:var(--primary);width:1.1em;height:1.1em;flex:none}
+.vid{display:flex;gap:.9em;align-items:flex-start;background:var(--card);border:2px solid var(--blue);border-radius:16px;padding:.8em;margin:.8em 0}
+.vid .pl{flex:none;width:3.4em;height:3.4em;border-radius:14px;background:var(--red);display:grid;place-items:center;color:#fff;font-size:1.3em;text-decoration:none;box-shadow:0 3px 0 #a91d29}
+.vid .pl:hover{background:#ff4d5a}
+.vid b{display:block;line-height:1.3}
+.vid small{display:block;color:var(--ink2);margin:.2em 0}
+.vid ul{margin:.2em 0 0;font-size:.92em}
+.sticker{font-size:clamp(34px,11cqw,64px);line-height:1}
+.hl{border-radius:6px;padding:0 .15em;transition:background .2s}
+.hl-kepala.on{background:#bfe3ff}.hl-leher.on{background:#d9c8ff}.hl-tubuh.on{background:#ffe3a8}.hl-kaki.on{background:#ffc9c9}
+:root[data-theme="dark"] .hl.on,:root:not([data-theme="light"]) .hl.on{color:#1d1b4b}
+.ill{display:block;margin-top:.4em;font-size:.82em;color:var(--ink2)}
+.art{background:var(--card);border-left:6px solid var(--primary);border-radius:10px;padding:.8em 1em;margin:.8em 0}
+.art h4{font-size:1.1em;margin-bottom:.2em}
+.meta{font-size:.82em;color:var(--ink2);margin-bottom:.5em}
+
+/* piramida */
+.pyr{display:flex;flex-direction:column;align-items:center;gap:.35em;margin:.8em 0}
+.pyr button{border:0;color:#fff;font-weight:700;padding:.65em .5em;cursor:pointer;border-radius:10px;clip-path:polygon(4% 0,96% 0,100% 100%,0 100%);transition:transform .15s,filter .15s}
+.pyr button:hover,.pyr button.on{transform:scale(1.03);filter:brightness(1.12)}
+.pyr button.on{outline:3px solid var(--orange)}
+.pyr small{display:block;font-weight:400;font-size:.8em}
+.pinfo{min-height:4.5em}
+.axis{text-align:center;font-size:.82em;color:var(--ink2)}
+
+/* kartu balik */
+.flip{border:2px solid var(--primary);background:var(--card);border-radius:16px;padding:.7em;cursor:pointer;text-align:left;min-height:7.2em;transition:background .2s}
+.flip .f{font-size:1.5em;font-weight:800;color:var(--primary)}
+.flip .f small{display:block;font-size:.5em;font-weight:600;color:var(--ink2)}
+.flip .bk{display:none;font-size:.9em}
+.flip.open{background:var(--primary);color:#fff}
+.flip.open .f{display:none}.flip.open .bk{display:block}
+.flip.open .bk b{color:#ffd37a}
+
+/* akordeon */
+.acc{background:var(--card);border:2px solid var(--line);border-radius:14px;margin:.5em 0;overflow:hidden}
+.acc>button{width:100%;text-align:left;background:none;border:0;padding:.7em 1em;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;gap:.5em}
+.acc>button::after{content:"＋";color:var(--primary);font-weight:800}
+.acc.open>button::after{content:"－"}
+.acc .bd{display:none;padding:0 1em .8em}
+.acc.open .bd{display:block}
+.acc.open{border-color:var(--primary)}
+
+/* pilihan cepat */
+.mq{margin:.7em 0}
+.mq .opt{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:.55em .9em;margin:.35em 0;cursor:pointer;line-height:1.4}
+.mq .opt:hover:not(:disabled){border-color:var(--primary)}
+.mq .opt.ok{background:var(--okbg);border-color:var(--ok)}
+.mq .opt.no{background:var(--nobg);border-color:var(--no)}
+.fb{display:none;margin:.4em 0;padding:.55em .9em;border-radius:12px;background:var(--soft);font-size:.93em}
+.fb.show{display:block}
+.rev{display:none}.rev.show{display:block}
+
+/* sampul */
+.cover{display:flex;flex-direction:column;min-height:100%}
+.logo{display:inline-flex;align-items:center;gap:.6em;background:var(--card);border-radius:12px;padding:.5em .9em;font-weight:800;box-shadow:0 3px 12px rgba(42,39,96,.15);color:var(--navy);font-size:.95em}
+:root[data-theme="dark"] .logo{color:var(--ink)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo{color:var(--ink)}}
+.ring{width:23cqw;height:23cqw;border-radius:50%;background:conic-gradient(var(--primary) 0 25%,var(--orange) 0 50%,var(--blue) 0 75%,var(--red) 0);display:grid;place-items:center;flex:none;box-shadow:0 4px 16px rgba(42,39,96,.25)}
+.ring span{width:76%;height:76%;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;font-weight:800;font-size:2.7cqw;color:var(--navy);line-height:1.15;padding:.3em}
+:root[data-theme="dark"] .ring span{color:var(--ink)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ring span{color:var(--ink)}}
+.cover .top{display:flex;justify-content:space-between;align-items:flex-start;gap:1em}
+.star{position:absolute;right:6cqw;top:45%;color:var(--orange);font-size:9cqw;font-weight:800}
+.books{font-size:clamp(50px,18cqw,110px);line-height:1;text-align:center}
+.cta{margin-top:auto;padding-top:.6em;text-align:center}
+.foot{margin:1em -5.5cqw -6cqw;background:var(--navy);color:#fff;padding:.8em 5.5cqw;display:flex;justify-content:space-between;gap:1em;font-size:.78em}
+.foot b{display:block}
+
+/* menu */
+.drawer{position:absolute;inset:0;background:var(--paper);z-index:5;display:none;flex-direction:column}
+.drawer.open{display:flex}
+.drawer header{background:var(--navy);color:#fff;padding:.9em 1.2em;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.drawer header button{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:999px;padding:.35em .9em;cursor:pointer}
+.drawer .lst{overflow:auto;padding:1em 1.2em;font-size:clamp(12.5px,3.1cqw,16px)}
+.drawer .grp{font-weight:800;color:var(--primary);margin:.9em 0 .3em}
+.drawer .lst button{display:flex;gap:.6em;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:.45em .8em;margin:.25em 0;cursor:pointer}
+.drawer .lst button.cur{border-color:var(--primary);background:var(--soft)}
+.peta{display:grid;grid-template-columns:1fr 1fr;gap:.7em;margin:.8em 0}
+.peta button{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:.8em;text-align:left;cursor:pointer;transition:transform .12s,border-color .12s}
+.peta button:hover{transform:translateY(-2px);border-color:var(--primary)}
+.peta .e{font-size:1.8em;display:block}
+.peta b{display:block;color:var(--primary)}
+.peta small{color:var(--ink2)}
+
+/* kuis */
+.qno{font-weight:700;color:var(--primary)}
+.qbar{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;margin:.4em 0 .8em}
+.qbar i{display:block;height:100%;background:var(--primary)}
+.score{text-align:center;padding:1em 0}
+.score .n{font-size:clamp(40px,14cqw,80px);font-weight:800;color:var(--primary);line-height:1}
+.qtext{background:var(--card);border-left:5px solid var(--orange);padding:.6em .9em;border-radius:8px;margin:.5em 0;font-style:italic}
+.toast{position:absolute;left:50%;bottom:14cqw;transform:translateX(-50%);background:var(--navy);color:#fff;padding:.5em 1em;border-radius:99px;font-size:.85em;opacity:0;pointer-events:none;transition:opacity .25s;z-index:6}
+.toast.show{opacity:1}
+@media (max-width:420px){.grid3{grid-template-columns:1fr 1fr}.peta{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="book" id="book">
+  <div class="prog"><i id="prog"></i></div>
+  <div class="scroll" id="scroll" tabindex="-1"></div>
+  <nav class="nav" aria-label="Navigasi modul">
+    <button id="prev" aria-label="Halaman sebelumnya">◀ Balik</button>
+    <button id="menuBtn" aria-label="Buka daftar isi">☰ Isi</button>
+    <div class="mid" id="mid"></div>
+    <button id="next" aria-label="Halaman berikutnya">Lanjut ▶</button>
+  </nav>
+  <div class="drawer" id="drawer">
+    <header><span>📚 Daftar Isi NewsLab</span><button id="closeMenu">Tutup ✕</button></header>
+    <div class="lst" id="lst"></div>
+  </div>
+  <div class="toast" id="toast">Jawabanmu tersimpan ✓</div>
+</main>
+
+<script>
+/* ===== Penyimpanan jawaban (aman bila storage kosong/ditolak) ===== */
+var STORE='newslab-xi-v1', state={};
+try{ state=JSON.parse(localStorage.getItem(STORE)||'{}')||{}; }catch(e){ state={}; }
+function persist(){ try{ localStorage.setItem(STORE,JSON.stringify(state)); }catch(e){} }
+
+/* ===== Helper pembuat HTML ===== */
+function ta(id,label,rows){ return '<label class="fl">'+label+'<textarea data-save="'+id+'" rows="'+(rows||2)+'"></textarea></label>'; }
+function inp(id,label){ return '<label class="fl">'+label+'<input type="text" data-save="'+id+'"></label>'; }
+function cell(id,rows){ return '<textarea data-save="'+id+'" rows="'+(rows||2)+'" aria-label="isian"></textarea>'; }
+function ck(id,label){ return '<label class="ck"><input type="checkbox" data-save="'+id+'"><span>'+label+'</span></label>'; }
+function tbl(h,rows){ return '<div class="wrap"><table class="tbl"><thead><tr>'+h.map(function(x){return '<th>'+x+'</th>'}).join('')+'</tr></thead><tbody>'+rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+c+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>'; }
+function vid(title,url,notes,label){
+  return '<div class="vid"><a class="pl" href="'+url+'" target="_blank" rel="noopener" aria-label="Buka video: '+title+'">▶</a><div><b>'+title+'</b><small>'+(label||'Ayo Menonton')+' · <a href="'+url+'" target="_blank" rel="noopener">'+url.replace('https://','')+'</a></small>'+(notes?'<b style="font-size:.9em;margin-top:.3em">Sambil menonton, catatlah:</b><ul>'+notes.map(function(n){return '<li>'+n+'</li>'}).join('')+'</ul>':'')+'</div></div>';
+}
+function acc(t,b,open){ return '<div class="acc'+(open?' open':'')+'"><button data-act="acc" aria-expanded="false">'+t+'</button><div class="bd">'+b+'</div></div>'; }
+function mq(q,opts,exp){ return '<div class="mq" data-exp="'+exp.replace(/"/g,'&quot;')+'"><p><b>'+q+'</b></p>'+opts.map(function(o){return '<button class="opt" data-act="mq" data-c="'+(o[1]?1:0)+'">'+o[0]+'</button>'}).join('')+'<div class="fb"></div></div>'; }
+function rev(label,body){ return '<button class="btn ghost sm" data-act="rev">'+label+'</button><div class="rev card g" style="margin-top:.5em">'+body+'</div>'; }
+function rubrik(title,heads,rows,crit){ return acc('📊 '+title, tbl(heads,rows)+(crit||'')); }
+function banner(e,t,s){ return '<div style="display:flex;gap:.7em;align-items:center;margin-bottom:.6em"><span class="sticker">'+e+'</span><div><div class="h2">'+t+'</div>'+(s?'<div class="lead" style="margin:0">'+s+'</div>':'')+'</div></div>'; }
+function goBtn(id,label){ return '<button class="btn sm" data-go="'+id+'">'+label+'</button>'; }
+
+/* ===== Halaman-halaman modul ===== */
+var P=[];
+function add(id,grp,title,html){ P.push({id:id,grp:grp,title:title,html:html}); }
+
+/* 1. Sampul */
+add('cover','Mulai','Sampul',
+'<div class="cover">'+
+ '<div class="top"><div><span class="logo">📰 NewsLab&nbsp;Digital</span><div style="margin-top:.5em"><span class="chip">Bahasa Indonesia</span><span class="chip">Kelas XI · Fase F</span></div></div>'+
+ '<div class="ring"><span>TEKS<br>BERITA<br>5W+1H</span></div></div>'+
+ '<h1 class="big" style="margin-top:.5em">Modul Interaktif</h1>'+
+ '<h1 class="big p">Teks Berita</h1>'+
+ '<p class="sub" style="margin:.6em 0 .2em">Aktual &amp; Akurat, Siap Jadi Reporter!</p>'+
+ '<div class="dark" style="margin-top:.7em">Belajar teks berita lewat <b>menyimak, membaca, menulis,</b> dan <b>berbicara</b>. Di akhir, kamu bikin <b>teks berita</b> dan <b>video reporter digital</b> bareng timmu. Seru dan gampang diikuti!</div>'+
+ '<div class="row" style="justify-content:space-between;align-items:flex-end"><div class="card" style="flex:1;min-width:0;margin:0"><div class="t" style="font-weight:800;color:var(--primary)">Isi Modul</div><ul style="font-size:.9em"><li>Materi singkat + kegiatan interaktif</li><li>Video menyimak (link YouTube)</li><li>LKPD yang bisa diisi langsung</li><li>25 soal kuis dengan pembahasan</li></ul></div><div class="books">📚</div></div>'+
+ '<div class="cta"><button class="btn red" data-go="peta" style="font-size:1.1em">MULAI BELAJAR!</button></div>'+
+ '<div class="foot"><div><b>Model: Project Based Learning</b>Produk akhir: teks berita &amp; video reporter</div><div style="text-align:right"><b>Based on Education Research</b>NewsLab Digital</div></div>'+
+'</div><div class="star" aria-hidden="true">✱</div>');
+
+/* 2. Peta */
+add('peta','Mulai','Peta Petualangan',
+ banner('🗺️','Peta Petualangan','Pilih jalurmu, atau ikuti urutannya.')+
+ '<div class="peta">'+
+ '<button data-go="definisi"><span class="e">📖</span><b>Materi</b><small>Definisi, struktur, 5W+1H, kaidah, aktual &amp; akurat</small></button>'+
+ '<button data-go="menyimak"><span class="e">🎧</span><b>Menyimak</b><small>Nonton berita, temukan 5W+1H</small></button>'+
+ '<button data-go="membaca"><span class="e">👓</span><b>Membaca</b><small>Bedah struktur &amp; bahasa berita</small></button>'+
+ '<button data-go="menulis"><span class="e">✍️</span><b>Menulis</b><small>Jadi wartawan &amp; editor</small></button>'+
+ '<button data-go="berbicara"><span class="e">🎤</span><b>Berbicara</b><small>Bikin vlog berita</small></button>'+
+ '<button data-go="kuis"><span class="e">🧠</span><b>Kuis</b><small>25 soal, langsung ada skor</small></button>'+
+ '</div>'+
+ '<h3 class="h3">Info singkat modul</h3>'+
+ tbl(['Komponen','Keterangan'],[
+  ['Judul','NewsLab Digital: Modul Interaktif Teks Berita Aktual dan Akurat'],
+  ['Mata pelajaran','Bahasa Indonesia'],['Kelas / Fase','XI SMA / Fase F'],
+  ['Model belajar','Project Based Learning (PjBL)'],
+  ['Produk akhir','Teks berita dan video reporter digital']])+
+ '<h3 class="h3">Empat keterampilan yang kamu latih</h3>'+
+ tbl(['Keterampilan','Kegiatanmu'],[
+  ['🎧 Menyimak','Menonton video berita aktual dan mencari informasi serta unsur 5W+1H.'],
+  ['👓 Membaca','Membaca dan menganalisis struktur, unsur, dan kaidah kebahasaan teks berita.'],
+  ['✍️ Menulis','Menulis berita dari fakta dengan struktur, 5W+1H, dan data yang akurat.'],
+  ['🎤 Berbicara','Menyampaikan berita lewat video ala reporter: lafal, intonasi, ekspresi, dan lancar.']]));
+
+/* 3. Tujuan */
+add('tujuan','Mulai','Tujuan & Ayo Berpikir',
+ banner('🎯','Tujuan Belajar','Setelah modul ini, kamu bisa:')+
+ '<div class="card"><ul>'+
+ '<li>Menemukan informasi penting dan unsur <b>5W+1H</b> dari berita yang kamu simak.</li>'+
+ '<li>Menganalisis <b>struktur</b> dan <b>kaidah kebahasaan</b> teks berita lewat membaca.</li>'+
+ '<li>Menulis teks berita yang <b>aktual, akurat, objektif,</b> dan sesuai struktur.</li>'+
+ '<li>Menyampaikan berita secara lisan dengan lafal, intonasi, ekspresi, dan kelancaran yang pas.</li>'+
+ '<li>Membuat <b>video reporter</b> sebagai produk akhir.</li></ul></div>'+
+ '<h3 class="h3">Kata kunci</h3><div>'+['berita','aktual','akurat','verifikasi','ADIKSIMBA','struktur','kaidah kebahasaan'].map(function(k){return '<span class="chip">'+k+'</span>'}).join('')+'</div>'+
+ '<div class="dark" style="margin-top:1em"><b>💭 Ayo Berpikir</b><p>Setiap hari kita menerima kabar dari televisi, radio, surat kabar, dan gawai. Tapi, tidak semua kabar layak dipercaya.</p></div>'+
+ ta('t1','1. Berita apa yang terakhir kali kamu baca atau tonton?')+
+ ta('t2','2. Bagian mana yang membuatmu yakin bahwa berita itu benar?')+
+ ta('t3','3. Apa yang akan kamu lakukan jika ada bagian berita yang terasa janggal?'));
+
+/* 4. Definisi */
+add('definisi','Materi','A. Definisi Teks Berita',
+ banner('📖','A. Apa Itu Teks Berita?')+
+ '<p>Banjir, pertandingan olahraga, atau kasus kriminal, semua kabar itu kita terima dalam bentuk <b>berita</b>. Berita adalah laporan tentang peristiwa atau fakta yang <b>aktual, menarik, dan bermanfaat</b>, disampaikan lewat media massa: surat kabar, majalah, radio, televisi, dan media daring.</p>'+
+ '<div class="card b"><div class="t">Teks berita</div>Teks yang berisi informasi tentang peristiwa yang sedang atau baru saja terjadi. Ditulis dengan bahasa jurnalistik dan disusun berdasarkan struktur tertentu.</div>'+
+ '<h3 class="h3">Ciri-ciri berita</h3>'+
+ '<div class="grid2"><div class="card" style="margin:0"><b>✅ Faktual</b><br>Peristiwanya benar-benar terjadi.</div><div class="card" style="margin:0"><b>⏱️ Aktual</b><br>Baru terjadi atau sedang berlangsung.</div><div class="card" style="margin:0"><b>⭐ Penting &amp; menarik</b><br>Bermanfaat dan menarik banyak orang.</div><div class="card" style="margin:0"><b>📡 Lewat media massa</b><br>Sampai ke khalayak luas.</div></div>'+
+ '<p>Berita ditulis dengan informasi yang logis, singkat, padat, dan jelas. Wartawan <b>tidak boleh menambahkan dugaan atau pendapat pribadi</b>. Kalau ingin menyampaikan pandangan seseorang, pandangan itu harus dikutip dan disebutkan siapa yang mengatakannya. Ini disebut <b>atribusi</b>.</p>'+
+ '<p>Beda dengan berita: tajuk rencana, artikel opini, dan surat pembaca berisi <i>pendapat</i> penulis, sedangkan iklan dibuat untuk kepentingan pemasang.</p>'+
+ '<h3 class="h3">Kenapa suatu peristiwa dijadikan berita? (Nilai berita)</h3>'+
+ tbl(['Nilai berita','Artinya'],[['Kebaruan','Peristiwa baru terjadi'],['Kedekatan','Terjadi di lingkungan pembaca'],['Dampak','Memengaruhi banyak orang'],['Ketokohan','Melibatkan orang yang dikenal luas'],['Keluarbiasaan','Jarang terjadi'],['Kemanusiaan','Menyentuh perasaan pembaca']])+
+ '<p>Semakin banyak nilai berita yang terpenuhi, semakin besar peluang peristiwa itu diberitakan.</p>'+
+ '<div class="card o"><div class="t">💡 Tahukah Kamu?</div>Kata <i>jurnalistik</i> berasal dari kata <i>jurnal</i> (journal) yang berarti laporan atau catatan. Dalam bahasa Prancis, <i>jour</i> berarti hari. Jadi, awalnya jurnalistik berkaitan dengan catatan harian tentang berbagai peristiwa.</div>'+
+ '<div class="card o"><div class="t">🗣️ Ayo Berdiskusi</div>Bandingkan dua kalimat ini, lalu diskusikan dengan teman sebangkumu: mana yang lebih pantas jadi bagian berita?'+
+ mq('Pilih satu kalimat:',[['(1) Kemarin ada kebakaran hebat, pasti gara-gara orang ceroboh.',0],['(2) Kebakaran terjadi di sebuah gudang pada Kamis sore; penyebabnya masih diselidiki petugas.',1]],'Kalimat (2) yang tepat. Kalimat itu berisi fakta (apa, di mana, kapan) dan tidak menebak penyebab. Kalimat (1) memuat dugaan pribadi ("pasti gara-gara orang ceroboh") yang tidak boleh ada di berita.')+'</div>');
+
+/* 5. Struktur */
+add('struktur','Materi','B. Struktur Teks Berita',
+ banner('🔻','B. Struktur Teks Berita','Pola piramida terbalik')+
+ vid('Teks Berita 2: Struktur dan Kaidah Kebahasaan Teks Berita','https://www.youtube.com/watch?v=C8zSCWNAhes',['Bagian-bagian struktur teks berita dan tugas masing-masing.','Mengapa informasi terpenting diletakkan di bagian atas?','Bagian mana yang boleh dipotong jika ruang terbatas?'])+
+ '<p>Teks berita tidak disusun sembarangan. Strukturnya terdiri atas <b>judul, kepala berita, leher berita, tubuh berita,</b> dan <b>kaki berita</b>, urut dari informasi <b>paling penting</b> ke yang <b>kurang penting</b>. Susunan ini disebut <b>pola piramida terbalik</b>, jadi pembaca yang hanya membaca bagian awal sudah dapat inti beritanya.</p>'+
+ '<p><b>👆 Tap tiap lapisan piramida</b> untuk melihat tugasnya:</p>'+
+ '<div class="pyr" id="pyr">'+
+ [['1. Judul','pokok berita, singkat, padat, jelas','#1f3f7a','100%'],['2. Kepala berita (teras)','apa, siapa, di mana, kapan','#2b6cb8','86%'],['3. Leher berita','penghubung dan penguat kepala berita','#3b9ae8','72%'],['4. Tubuh berita','mengapa dan bagaimana, kronologis','#f0a020','58%'],['5. Kaki berita','info tambahan','#e0742d','44%']].map(function(r,i){return '<button data-act="pyr" data-i="'+i+'" style="background:'+r[2]+';width:'+r[3]+'">'+r[0]+'<small>'+r[1]+'</small></button>'}).join('')+
+ '</div><div class="axis">⬇ informasi paling penting → kurang penting</div>'+
+ '<div class="card b pinfo" id="pinfo"><div class="t">Detail bagian</div>Tap salah satu lapisan di atas.</div>'+
+ '<h3 class="h3">Tabel ringkasan</h3>'+
+ tbl(['Bagian','Isi','Ciri'],[
+  ['<b>Judul</b>','Pokok peristiwa yang diberitakan.','Singkat, padat, jelas, sekitar 3–8 kata, sesuai isi berita.'],
+  ['<b>Kepala berita</b>','Informasi utama: siapa, apa, di mana, kapan.','Pembaca sudah tahu inti berita hanya dari bagian ini.'],
+  ['<b>Leher berita</b>','Kelanjutan kepala berita; menghubungkannya dengan tubuh berita.','Memberi keterangan tambahan agar kepala berita lebih mudah dipahami.'],
+  ['<b>Tubuh berita</b>','Penjabaran lebih lanjut, termasuk mengapa dan bagaimana.','Disusun kronologis (berurutan menurut waktu).'],
+  ['<b>Kaki berita</b>','Informasi tambahan yang kurang penting.','Di bagian akhir dan boleh dipotong jika ruang terbatas.']])+
+ '<div class="card o"><div class="t">📌 Informasi Penting</div>Ruang halaman media itu terbatas, jadi editor biasanya memotong bagian paling bawah berita. Itu sebabnya informasi terpenting selalu ada di atas.</div>');
+
+/* 6. 5W+1H */
+add('unsur','Materi','C. Unsur Berita 5W+1H',
+ banner('🔎','C. Unsur Berita (5W+1H)','Dikenal juga sebagai ADIKSIMBA')+
+ '<p>Berita yang baik wajib menjawab <b>enam pertanyaan dasar</b>: <i>what, who, where, when, why,</i> dan <i>how</i>. Dalam bahasa Indonesia disingkat <b>ADIKSIMBA</b>: <b>A</b>pa, <b>DI</b>mana, <b>K</b>apan, <b>SI</b>apa, <b>M</b>engapa, <b>BA</b>gaimana.</p>'+
+ '<p><b>👆 Tap kartunya</b> untuk membalik:</p>'+
+ '<div class="grid3">'+[
+  ['What','Apa','Peristiwa apa yang terjadi?','Kepala berita'],
+  ['Who','Siapa','Siapa yang mengalami atau terlibat?','Kepala berita'],
+  ['Where','Di mana','Di mana peristiwa itu terjadi?','Kepala berita'],
+  ['When','Kapan','Kapan peristiwa itu terjadi?','Kepala berita'],
+  ['Why','Mengapa','Mengapa peristiwa itu terjadi?','Tubuh berita'],
+  ['How','Bagaimana','Bagaimana peristiwa itu terjadi?','Tubuh berita']].map(function(r){return '<button class="flip" data-act="flip"><span class="f">'+r[0]+'<small>'+r[1]+'</small></span><span class="bk"><b>'+r[1]+'</b><br>'+r[2]+'<br><i>Letak: '+r[3]+'</i></span></button>'}).join('')+'</div>'+
+ '<p style="margin-top:.8em">Kalau satu unsur hilang, pembaca sulit paham utuh. Misalnya berita yang hanya berbunyi <i>“Terjadi kebakaran”</i> belum menyebut siapa yang terlibat, di mana, dan kapan.</p>'+
+ '<p>Keenamnya saling melengkapi. <b>Apa, siapa, di mana, kapan</b> menjawab <i>kenyataan</i> peristiwa, sedangkan <b>mengapa dan bagaimana</b> menjawab <i>sebab dan proses</i>. Berita yang cuma memuat empat unsur pertama terasa datar, sebab pembaca tahu apa yang terjadi tetapi tidak tahu kenapa.</p>'+
+ '<div class="card o"><div class="t">🧠 Tips Mengingat</div>Singkatan <b>ADIKSIMBA</b> membantumu mengingat enam unsur: Apa, Di mana, Kapan, Siapa, Mengapa, Bagaimana.</div>');
+
+/* 7. Contoh berita */
+add('contoh','Materi','Contoh Berita & Analisis',
+ banner('📰','Contoh Teks Berita','Baca dengan saksama, lalu bedah!')+
+ '<p><b>👆 Tap tombol warna</b> untuk menandai bagian strukturnya:</p>'+
+ '<div class="row" id="hlbtns">'+
+ '<button class="btn sm" style="background:#3b9ae8" data-act="hl" data-k="kepala">Kepala</button><button class="btn sm" style="background:#7c4dff" data-act="hl" data-k="leher">Leher</button><button class="btn sm" style="background:#e08a00" data-act="hl" data-k="tubuh">Tubuh</button><button class="btn sm" style="background:#d84b4b" data-act="hl" data-k="kaki">Kaki</button></div>'+
+ '<div class="art"><h4>HUT Kota Batu Ke-25 Dimeriahkan Puluhan Acara hingga Desember 2026</h4>'+
+ '<p><span class="hl hl-kepala"><b>BATU</b> — Pemerintah Kota Batu menyiapkan puluhan acara untuk memeriahkan Hari Ulang Tahun (HUT) ke-25 Kota Batu yang digelar tanpa jeda selama tiga bulan hingga Desember 2026, Jumat (2/10/2026).</span></p>'+
+ '<p><span class="hl hl-leher">Puncak peringatan hari jadi tersebut akan berlangsung pada 17 Oktober 2026 melalui upacara di Balai Kota Among Tani, dengan seluruh peserta mengenakan pakaian adat khas Kota Batu.</span></p>'+
+ '<p><span class="hl hl-tubuh">Wali Kota Batu Nurochman menyampaikan bahwa usia 25 tahun menjadi momentum penting untuk menengok kembali perjalanan kota sekaligus menentukan arah pembangunan ke depan. Menurutnya, arah pembangunan itu harus bermuara pada kemakmuran dan kemaslahatan warga. Sebagai bagian dari perayaan, Badan Pendapatan Daerah (Bapenda) Kota Batu juga meluncurkan program pembebasan denda administratif pajak daerah pada 1–31 Oktober 2026 untuk meringankan beban tunggakan masyarakat.</span></p>'+
+ '<p><span class="hl hl-kaki">Pemkot Batu berharap kebijakan tersebut meningkatkan kesadaran warga dalam membayar pajak sekaligus menambah pendapatan asli daerah. Warga pun diimbau memanfaatkan program ini dan tidak menunda pembayaran hingga mendekati batas akhir.</span></p>'+
+ '<span class="ill">Sumber: diadaptasi dari Tugu Jatim dan Malang Post, 2 Oktober 2026.</span></div>'+
+ '<p>Perhatikan: kepala berita sudah menjawab <b>apa, siapa, di mana, kapan</b>. Pertanyaan <b>mengapa dan bagaimana</b> dijawab di tubuh berita.</p>'+
+ '<h3 class="h3">Analisis 5W+1H</h3>'+
+ tbl(['Unsur','Temuan dalam teks'],[
+  ['<b>What</b> (apa)','Pemkot Batu menyiapkan puluhan acara peringatan HUT ke-25 Kota Batu, termasuk pembebasan denda pajak daerah.'],
+  ['<b>Who</b> (siapa)','Pemerintah Kota Batu, Wali Kota Batu Nurochman, dan Bapenda Kota Batu; warga sebagai sasaran.'],
+  ['<b>Where</b> (di mana)','Kota Batu, upacara puncak di Balai Kota Among Tani.'],
+  ['<b>When</b> (kapan)','Diumumkan Jumat, 2 Oktober 2026; acara hingga Desember 2026; puncak 17 Oktober 2026; bebas denda 1–31 Oktober 2026.'],
+  ['<b>Why</b> (mengapa)','Usia 25 tahun jadi momentum menengok perjalanan dan menentukan arah pembangunan; pembebasan denda untuk meringankan tunggakan dan meningkatkan kepatuhan pajak.'],
+  ['<b>How</b> (bagaimana)','Lewat puluhan acara, upacara puncak berpakaian adat, dan program pembebasan denda pajak.']])+
+ '<div class="card o"><div class="t">🧩 Ayo Mencoba</div>Tentukan bagian struktur untuk kalimat berikut.'+
+ mq('“Puncak peringatan hari jadi tersebut akan berlangsung pada 17 Oktober 2026 melalui upacara di Balai Kota Among Tani…”',[['Kepala berita',0],['Leher berita',1],['Tubuh berita',0],['Kaki berita',0]],'Leher berita. Kalimat ini melanjutkan dan memperkuat kepala berita (menambahkan puncak acara) sebagai jembatan ke tubuh berita.')+
+ mq('“Pemkot Batu berharap kebijakan tersebut meningkatkan kesadaran warga dalam membayar pajak…”',[['Kepala berita',0],['Leher berita',0],['Tubuh berita',0],['Kaki berita',1]],'Kaki berita. Isinya harapan dan imbauan tambahan; kalau dihapus, inti berita tetap utuh.')+'</div>');
+
+/* 8. Kaidah */
+add('kaidah','Materi','D. Kaidah Kebahasaan',
+ banner('🗣️','D. Kaidah Kebahasaan','Ciri bahasa khas berita')+
+ vid('Struktur dan Kaidah Kebahasaan Teks Berita (Rumah Belajar)','https://www.youtube.com/watch?v=RirjRNj8a-4',['Kaidah kebahasaan apa saja yang disebutkan dalam video?','Apa bedanya kalimat langsung dan kalimat tidak langsung?','Satu contoh kalimat yang menurutmu sesuai kaidah berita.'])+
+ '<p>Selain punya struktur, berita punya <b>kaidah kebahasaan</b>. Ada <b>enam</b> yang perlu kamu kenali. <b>Tap</b> untuk membuka:</p>'+
+ acc('1️⃣ Bahasa baku','Kata, frasa, dan kalimat sesuai kaidah bahasa Indonesia baku.<br><b>Contoh:</b> menutup kejuaraan (bukan: <i>nutup lomba</i>).')+
+ acc('2️⃣ Kalimat langsung','Kutipan pernyataan narasumber dengan tanda petik, sebagai variasi kalimat tidak langsung.<br><b>Contoh:</b> “…berhasil dievakuasi oleh tim SAR gabungan…,” kata Nanang Sigit.')+
+ acc('3️⃣ Konjungsi <i>bahwa</i>','Kata penghubung yang menerangkan isi pernyataan sesudahnya.<br><b>Contoh:</b> Ia menilai <b>bahwa</b> antusiasme mereka …')+
+ acc('4️⃣ Kata kerja mental','Kata kerja tentang berpikir, perasaan, atau harapan.<br><b>Contoh:</b> menilai, mengapresiasi, berharap, menduga, mengakui.')+
+ acc('5️⃣ Keterangan waktu dan tempat','Menjelaskan kapan dan di mana peristiwa terjadi.<br><b>Contoh:</b> di GOR Gajahmada Kota Batu; Minggu (6/9/2026).')+
+ acc('6️⃣ Konjungsi temporal','Kata penghubung yang menyatakan urutan waktu.<br><b>Contoh:</b> Sebelumnya, kejuaraan … ; kemudian; setelah itu.')+
+ '<h3 class="h3">Gaya bahasa jurnalistik</h3>'+
+ '<p>Bahasa jurnalistik pada dasarnya adalah bahasa Indonesia baku yang <b>dihemat</b>. Wartawan memilih kata yang mudah dipahami, menghindari istilah yang tidak dijelaskan, dan menulis kalimat <b>lugas</b>. Kalimatnya pendek, <b>satu kalimat satu gagasan</b>, dan lebih sering <b>aktif</b> supaya pelakunya jelas.</p>'+
+ '<h3 class="h3">Kalimat langsung vs tidak langsung</h3>'+
+ tbl(['','Kalimat langsung','Kalimat tidak langsung'],[
+  ['Bentuk','Menyalin ucapan apa adanya, diapit tanda petik (“ ”)','Melaporkan isi ucapan tanpa tanda petik'],
+  ['Ciri','Diikuti ujarnya, katanya, tuturnya','Sering memakai konjungsi <i>bahwa</i>'],
+  ['Cocok untuk','Pernyataan penting, khas, atau bernada perasaan','Keterangan yang bersifat data (lebih efisien)']])+
+ '<div class="card o"><div class="t">✏️ Jangan lupa tanda baca</div>Koma diletakkan <b>sebelum</b> tanda petik penutup: “Kami terus memperbaiki program,” ujarnya.</div>'+
+ '<p>Kata kerja mental dipakai untuk melaporkan pikiran atau perasaan <b>narasumber</b>, bukan pikiran wartawan. Karena itu, hampir selalu menempel pada nama atau jabatan seseorang.</p>');
+
+/* 9. Aktual */
+add('aktual','Materi','E. Berita Aktual',
+ banner('⏱️','E. Berita Aktual & Akurat')+
+ vid('Menentukan Informasi Aktual dan Akurat dalam Teks Berita','https://www.youtube.com/watch?v=djM9_WUmIIs',['Apa yang dimaksud aktual dan apa yang dimaksud akurat?','Bagaimana cara menilai keaktualan sebuah berita?','Hal apa saja yang diperiksa untuk menilai keakuratan berita?'])+
+ '<p>Tidak semua tulisan tentang peristiwa layak disebut berita. Berita yang baik harus <b>benar, lengkap, berimbang,</b> dan <b>bermanfaat</b>. Dua ciri yang paling sering diuji: <b>aktual</b> dan <b>akurat</b>.</p>'+
+ '<h3 class="h3">1. Berita aktual</h3>'+
+ '<p>Berita aktual memberitakan peristiwa yang <b>baru terjadi atau sedang berlangsung</b>. Keaktualan diukur dari <b>jarak waktu antara peristiwa dan penerbitannya</b>, bukan sekadar tanggal terbit.</p>'+
+ '<div class="grid2"><div class="card o" style="margin:0"><b>❌ Tidak aktual</b><br>Diunggah hari ini, tetapi menceritakan peristiwa 3 bulan lalu tanpa perkembangan baru.</div><div class="card g" style="margin:0"><b>✅ Bisa aktual lagi</b><br>Peristiwa lama kembali aktual kalau ada fakta baru, misalnya putusan pengadilan atas perkara lama.</div></div>'+
+ '<div class="card b"><div class="t">🔑 Kuncinya</div>Bandingkan <b>dua tanggal</b> sekaligus: kapan peristiwa terjadi dan kapan berita diterbitkan.</div>'+
+ mq('Berita A: kegiatan penghijauan 7 September 2026, diberitakan di hari yang sama. Berita B: kegiatan yang sama, baru diberitakan 20 September 2026. Mana yang lebih aktual?',[['Berita A, karena waktu terbitnya lebih dekat dengan peristiwa',1],['Berita B, karena lebih lengkap',0]],'Berita A. Keaktualan dilihat dari jarak waktu peristiwa dan penerbitan, bukan dari kelengkapan.'));
+
+/* 10. Akurat */
+add('akurat','Materi','Berita Akurat',
+ banner('🎯','2. Berita Akurat')+
+ '<p>Berita akurat berisi informasi yang <b>tepat, benar, dan tanpa kesalahan</b>. Penulis harus memperoleh informasi pasti dan <b>tidak boleh menebak-nebak</b>. Kesalahan bisa bikin pembaca salah paham, menurunkan kepercayaan, bahkan berujung tuntutan hukum.</p>'+
+ '<p>Ketelitian itu soal hal kecil: salah satu angka jumlah korban, salah mengeja nama narasumber, atau keliru menyebut jabatan sudah cukup membuat berita dinilai tidak akurat.</p>'+
+ '<div class="card b"><div class="t">⚖️ Ralat &amp; Hak Jawab</div><b>Ralat/koreksi</b>: media yang bertanggung jawab memuatnya jika ada kesalahan.<br><b>Hak jawab</b>: kesempatan bagi pihak yang dirugikan untuk menyampaikan tanggapan atas berita yang keliru.</div>'+
+ '<h3 class="h3">5 pertanyaan uji keakuratan</h3>'+
+ tbl(['No.','Yang diperiksa','Pertanyaan uji'],[
+  ['1','Cek informasi','Apakah informasi sudah dicek kembali kepada sumber berita?'],
+  ['2','Ketepatan data','Apakah data, tanggal, nama narasumber, dan tempat ditulis tanpa kesalahan?'],
+  ['3','Sumber yang relevan','Apakah sumber cocok dengan peristiwa yang diberitakan?'],
+  ['4','Judul sesuai isi','Apakah judul berhubungan dengan isi berita?'],
+  ['5','Foto sesuai isi','Apakah foto berhubungan dengan dan mendukung isi berita?']])+
+ '<div class="card o"><div class="t">Contoh</div>Judul: “Ratusan Siswa Raih Juara Lomba Sains”. Isi: “Tiga siswa SMAN 3 Harapan meraih juara …”<br>Judul dan isi tidak sesuai → <b>tidak akurat</b>. Judul tepat: “Tiga Siswa SMAN 3 Harapan Juara Lomba Sains”.</div>'+
+ '<h3 class="h3">3. Aktual vs akurat</h3>'+
+ tbl(['Aspek','Aktual','Akurat'],[
+  ['Makna','Memberitakan peristiwa yang baru atau sedang terjadi.','Informasi tepat, benar, tanpa kesalahan.'],
+  ['Pertanyaan uji','Apakah peristiwa ini baru terjadi?','Apakah data, nama, dan tanggalnya benar dan sudah dicek?'],
+  ['Tantangan','Menuntut kecepatan penyampaian.','Menuntut ketelitian dan pengecekan ulang.']])+
+ '<p>Berita yang baik memenuhi <b>keduanya</b>. Cepat tapi keliru merusak kepercayaan; benar tapi terlambat kehilangan manfaat. Berita yang baik juga <b>objektif</b>: menyajikan fakta, tidak memihak, dan tanpa pendapat pribadi penulis.</p>'+
+ mq('Sebuah akun media sosial mengunggah “fenomena alam aneh di Kota Batu” 5 menit lalu, tanpa sumber, data, atau bukti. Penilaian paling tepat?',[['Pasti akurat karena baru diunggah',0],['Aktual, tetapi keakuratannya masih perlu diperiksa',1],['Akurat karena banyak yang membagikan',0]],'Aktual (baru), tetapi akurat belum tentu. Tanpa sumber dan bukti, informasi harus diverifikasi dulu.'));
+
+/* 11. Verifikasi */
+add('verifikasi','Materi','Verifikasi & Hoaks',
+ banner('🛡️','4. Verifikasi Sebelum Share')+
+ vid('Kenali Ciri-ciri Hoaks di Ruang Digital | Cek Fakta','https://www.youtube.com/watch?v=uGpD8letpP0',['Ciri-ciri hoaks yang disebutkan dalam video.','Apakah ada ciri yang pernah kamu temukan di media sosial?'])+
+ '<p>Di media sosial, informasi yang belum tentu benar sering menyebar <b>lebih cepat</b> daripada berita yang sudah diperiksa. Karena itu kita perlu <b>verifikasi</b>: memeriksa kebenaran informasi <i>sebelum</i> meneruskannya.</p>'+
+ '<h3 class="h3">Checklist verifikasi (centang yang sudah kamu lakukan)</h3>'+
+ '<div class="card">'+
+ ck('v1','<b>Periksa sumber.</b> Berasal dari media resmi yang mencantumkan nama penulis dan alamat redaksi?')+
+ ck('v2','<b>Bandingkan isi</b> dengan sekurang-kurangnya dua media lain.')+
+ ck('v3','<b>Periksa tanggal terbit.</b> Berita lama yang diunggah ulang sering dikira peristiwa baru.')+
+ ck('v4','<b>Telusuri asal foto/video.</b> Gambar peristiwa lama sering dipakai untuk peristiwa berbeda.')+
+ ck('v5','<b>Bandingkan judul dengan isi.</b> Judul umpan klik biasanya melebih-lebihkan isi.')+'</div>'+
+ '<div class="card o"><div class="t">🕵️ Ayo Mencoba: Uji Berita</div>Pilih satu berita dari surat kabar atau portal berita, lalu periksa dan presentasikan.'+
+ ta('u1','Judul &amp; sumber berita yang kamu pilih')+
+ ta('u2','Apakah aktual? Kapan peristiwa terjadi dan kapan berita terbit?')+
+ ta('u3','Apakah unsur 5W+1H lengkap?')+
+ ta('u4','Apakah judul sesuai isi dan data tampak benar?')+'</div>');
+
+/* 12. Rangkuman */
+add('rangkuman','Materi','Rangkuman & Refleksi',
+ banner('📝','Rangkuman','Ingat kembali!')+
+ '<div class="dark"><ul style="margin:0">'+
+ '<li>Teks berita melaporkan peristiwa <b>aktual dan faktual</b> lewat media massa.</li>'+
+ '<li>Struktur: <b>judul, kepala, leher, tubuh, kaki</b> (terpenting → kurang penting).</li>'+
+ '<li>Unsur berita: <b>5W+1H</b> (ADIKSIMBA).</li>'+
+ '<li>Kaidah bahasa: <b>bahasa baku, kalimat langsung, konjungsi bahwa, kata kerja mental, keterangan waktu &amp; tempat, konjungsi temporal</b>.</li>'+
+ '<li>Berita baik itu <b>aktual</b> (baru) dan <b>akurat</b> (tepat, benar), serta berimbang dan objektif.</li>'+
+ '<li>Sebelum dibagikan, <b>verifikasi</b> dulu!</li></ul></div>'+
+ '<h3 class="h3">Refleksi</h3>'+
+ ta('r1','Bagian materi mana yang paling mudah kamu pahami?')+
+ ta('r2','Bagian mana yang masih perlu kamu pelajari lagi?')+
+ ta('r3','Bagaimana kamu akan menilai sebuah berita sebelum membagikannya?')+
+ '<div class="row" style="margin-top:1em">'+goBtn('menyimak','Lanjut ke Menyimak 🎧')+'</div>');
+
+/* 13. Menyimak */
+add('menyimak','Menyimak','Menyimak: Prediksi',
+ banner('🎧','Mari Menyimak Berita!')+
+ '<div class="card b"><div class="t">🎯 Tujuan</div><ol><li>Menemukan informasi penting dari berita yang disimak.</li><li>Mengidentifikasi unsur 5W+1H.</li><li>Membedakan informasi utama dan pendukung.</li><li>Menyimpulkan isi berita yang disimak.</li></ol></div>'+
+ '<h3 class="h3">Pemanasan: Buat Prediksi</h3>'+
+ '<p>Amati dua gambar ini.</p>'+
+ '<div class="grid2"><div class="card" style="text-align:center;margin:0"><div class="sticker">🏝️</div><b>Gambar 1</b><br>Suasana tempat wisata</div><div class="card" style="text-align:center;margin:0"><div class="sticker">🌊</div><b>Gambar 2</b><br>Peristiwa bencana</div></div>'+
+ '<p>Berdasarkan gambar, prediksikan berita yang mungkin akan kamu simak!</p>'+
+ tbl(['Gambar','Prediksi topik berita'],[['Gambar 1',cell('p1')],['Gambar 2',cell('p2')]])+
+ '<div class="card o"><div class="t">💡 Tahukah kamu?</div>Berita bisa membahas pariwisata, pendidikan, olahraga, kesehatan, lingkungan, maupun bencana. Membuat prediksi sebelum menyimak membantu kita memusatkan perhatian dan memahami isi berita.</div>'+
+ '<div class="row">'+goBtn('misi1','Misi 1: Berita Wisata ▶')+'</div>');
+
+/* 14. Misi 1 */
+function w5table(p){ return tbl(['Unsur berita','Informasi yang ditemukan'],['Apa','Siapa','Di mana','Kapan','Mengapa','Bagaimana'].map(function(u,i){return [u,cell(p+i)]})); }
+add('misi1','Menyimak','Misi 1: Berita Wisata',
+ banner('🏝️','Misi 1: Jelajah Berita Wisata')+
+ vid('Video berita pariwisata','https://youtu.be/0xQfihAsggA?si=K-uJAKN07oW0LfJe',null,'🎧 Simak berita berikut!')+
+ '<p>Video bisa ditayangkan guru lewat proyektor, atau kamu simak sendiri lewat tombol ▶ di atas.</p>'+
+ '<div class="card b"><div class="t">Putaran 1: Menangkap gambaran umum</div>Simak video <b>satu kali</b> tanpa mencatat semuanya. Fokus ke topik dan gambaran umum.</div>'+
+ tbl(['Pertanyaan','Jawaban'],[['Apa topik utama berita wisata yang kamu simak?',cell('w1')],['Di mana lokasi yang disebutkan?',cell('w2')],['Informasi apa yang paling kamu ingat?',cell('w3')]])+
+ '<div class="card b"><div class="t">Putaran 2: Menemukan informasi 5W+1H</div>Simak lagi, kali ini cari informasi yang lebih rinci.</div>'+
+ w5table('wt')+
+ '<p><i>Catatan: tidak semua berita menyampaikan 5W+1H sama jelasnya. Tulis hanya yang benar-benar kamu temukan di video.</i></p>'+
+ '<div class="row">'+goBtn('misi2','Misi 2: Berita Bencana ▶')+'</div>');
+
+/* 15. Misi 2 */
+add('misi2','Menyimak','Misi 2: Berita Bencana',
+ banner('🌊','Misi 2: Detektif Berita Bencana')+
+ vid('Video berita peristiwa bencana','https://youtu.be/hJIlzdaEmGo?si=ENbPNihetp9M6-JZ',null,'🎧 Simak berita berikut!')+
+ '<div class="card b"><div class="t">Putaran 1: Mengidentifikasi gambaran umum</div>Simak <b>satu kali</b>. Fokus pada peristiwa utama, lokasi, dan informasi yang paling menonjol.</div>'+
+ tbl(['Pertanyaan','Jawaban'],[['Apa topik utama berita bencana yang kamu simak?',cell('b1')],['Di mana lokasi yang disebutkan?',cell('b2')],['Informasi apa yang paling kamu ingat?',cell('b3')]])+
+ '<div class="card b"><div class="t">Putaran 2: Jadi detektif 5W+1H 🕵️</div>Simak lagi, lalu temukan informasi pentingnya.</div>'+
+ w5table('bt')+
+ '<div class="row">'+goBtn('banding','Bandingkan kedua berita ▶')+'</div>');
+
+/* 16. Bandingkan */
+add('banding','Menyimak','Bandingkan & Refleksi',
+ banner('⚖️','Ayo Membandingkan!','Berita wisata vs berita bencana')+
+ tbl(['Aspek','Berita Wisata','Berita Bencana'],['Topik berita','Peristiwa utama','Lokasi peristiwa','Informasi penting','Fakta yang ditemukan'].map(function(a,i){return [a,cell('c'+i+'a'),cell('c'+i+'b')]}))+
+ '<h3 class="h3">Refleksi</h3>'+
+ ta('f1','1. Apa persamaan informasi yang ada di kedua berita?')+
+ ta('f2','2. Apa perbedaan informasi yang paling menonjol?')+
+ ta('f3','3. Menurutmu, mengapa informasi di kedua berita berbeda?')+
+ rubrik('Rubrik Penilaian Menyimak',['Aspek','Skor 4','Skor 3','Skor 2','Skor 1'],[
+  ['Pemahaman isi berita','Informasi utama dan penting ditemukan sangat tepat','Sebagian besar tepat','Beberapa informasi, kurang tepat','Belum mampu menemukan informasi penting'],
+  ['Unsur 5W+1H','Seluruh unsur tepat','4–5 unsur tepat','2–3 unsur tepat','0–1 unsur tepat'],
+  ['Membandingkan berita','Persamaan dan perbedaan tepat &amp; lengkap','Cukup tepat','Sebagian persamaan/perbedaan','Belum mampu membandingkan'],
+  ['Refleksi &amp; kesimpulan','Tepat, jelas, berdasarkan isi berita','Cukup tepat','Kurang lengkap','Belum mampu menyimpulkan']],
+  '<p><b>Skor maks 16.</b> Nilai = (skor ÷ 16) × 100.<br>14–16 Sangat Baik · 11–13 Baik · 8–10 Cukup · ≤7 Perlu Bimbingan</p>')+
+ '<div class="row" style="margin-top:.8em">'+goBtn('membaca','Lanjut ke Membaca 👓')+'</div>');
+
+/* 17. Membaca */
+add('membaca','Membaca','Membaca: Teks Berita',
+ banner('👓','Mari Membaca Teks Berita!')+
+ '<div class="card b"><div class="t">🎯 Tujuan</div><ol><li>Mengidentifikasi struktur (judul, teras, tubuh, kaki).</li><li>Menganalisis unsur ADIKSIMBA.</li><li>Membedakan fakta dan opini.</li><li>Menganalisis kaidah kebahasaan.</li><li>Menganalisis keterkaitan struktur dan unsur kebahasaan.</li><li>Menyimpulkan isi berita.</li></ol></div>'+
+ '<h3 class="h3">Pertanyaan pemantik</h3>'+
+ '<ol><li>Pernah bingung membedakan bagian inti (teras) dan detail tambahan? Bagaimana cara mengenalinya?</li><li>Mengapa berita harus memuat ADIKSIMBA secara lengkap?</li><li>Kalau diminta menganalisis struktur dan unsur sebuah berita, langkah pertamamu apa?</li></ol>'+
+ ta('m1','Jawabanmu (boleh singkat):',3)+
+ '<h3 class="h3">Baca beritanya!</h3>'+
+ '<div class="art"><h4>Wisatawan Rusia Tersangkut Pohon Pinus Saat Paralayang di Kota Batu, Evakuasi Berlangsung Berjam-jam</h4>'+
+ '<div class="meta">Tayang: Rabu, 26 Agustus 2026 13:25 WIB · Penulis: Dya Ayu · Editor: Ndaru Wijayanto</div>'+
+ '<p><b>TRIBUNJATIM.COM, BATU</b> - Wisatawan asal Rusia, Aleksandr Popov (35), tersangkut di pohon pinus setinggi sekitar 20 meter di Desa Gunungsari, Kecamatan Bumiaji, Kota Batu, Jawa Timur, Selasa (25/8/2026).</p>'+
+ '<p>Aleksandr mengalami insiden tersebut setelah melakukan aktivitas paralayang dari kawasan Gunung Banyak, Desa Songgokerto, Kota Batu, pada Selasa sore.</p>'+
+ '<p>Kepala Kantor SAR Kelas A Surabaya, Nanang Sigit, mengatakan tim SAR menerima laporan dari personel BPBD Kota Batu mengenai seorang paraglider asing yang mengalami masalah dan tersangkut di pohon.</p>'+
+ '<p>Satu tim rescue Unit Siaga SAR Malang Raya kemudian dikerahkan bersama BPBD Kota Batu, pengelola wisata paralayang, dan warga sekitar untuk melakukan evakuasi.</p>'+
+ '<p>“Yang bersangkutan berhasil dievakuasi oleh tim SAR gabungan dari atas pohon pinus dalam kondisi selamat, dan tidak ditemukan cedera setelah personel medis melakukan pemeriksaan,” kata Nanang Sigit, Rabu (26/8/2026).</p>'+
+ '<p>Proses evakuasi berlangsung sekitar dua jam. Kondisi medan yang sulit serta posisi korban yang berada di atas pohon dengan masih mengenakan peralatan paralayang membuat proses penyelamatan harus dilakukan secara hati-hati.</p>'+
+ '<p>“Sesampainya di lokasi tim SAR gabungan melakukan asesmen untuk menentukan metode yang aman dalam menurunkan korban. Kondisi medan dan posisi korban yang berada di atas pohon membuat tim SAR gabungan melakukan penanganan dengan hati-hati,” jelasnya.</p>'+
+ '<p>Setelah menentukan metode penyelamatan yang aman, tim SAR gabungan selanjutnya menyiapkan peralatan vertical rescue guna mengevakuasi korban dengan metode lowering. Dengan metode ini, korban diturunkan bertahap dari ketinggian dengan sistem tali dan perangkat keselamatan.</p>'+
+ '<p>Sementara itu Koordinator Unit Siaga SAR Malang Raya, Imam Nahrowi menjelaskan korban berhasil dievakuasi pada pukul 22.00 WIB dan langsung menjalani pemeriksaan medis.</p>'+
+ '<p>Imam mengatakan minimnya penerangan di area hutan dan posisi korban yang berada di antara pepohonan membuat setiap tahapan evakuasi dilakukan dengan hati-hati untuk mencegah terjadinya cedera.</p>'+
+ '<p>“Setelah dipastikan dalam kondisi baik, korban diserahkan kepada pihak pengelola wisata paralayang dan pihak keluarganya guna penanganan lebih lanjut,” terang Imam</p></div>'+
+ '<div class="row">'+goBtn('lkpd1','Kerjakan LKPD Analisis ▶')+'</div>');
+
+/* 18. LKPD analisis */
+add('lkpd1','Membaca','LKPD Analisis Berita',
+ banner('📋','LKPD: Struktur & Unsur Kebahasaan','Kelompok · Kelas XI · Ganjil')+
+ '<div class="grid2">'+inp('k_nama','Nama kelompok')+inp('k_kelas','Kelas')+'</div>'+
+ '<div class="card"><b>Petunjuk:</b><ol><li>Baca teks berita dengan teliti.</li><li>Diskusikan hasil analisis bersama kelompok.</li><li>Identifikasi struktur dan unsur kebahasaan.</li><li>Tulis hasilnya pada tabel.</li></ol></div>'+
+ tbl(['Aspek yang dianalisis','Hasil analisis'],['Judul','Kepala Berita','Leher Berita','Tubuh Berita','Kaki Berita','What (Apa)','Who (Siapa)','When (Kapan)','Where (Di mana)','Why (Mengapa)','How (Bagaimana)','Kata kerja','Konjungsi','Kata keterangan','Kata baku','Kalimat langsung/tidak langsung'].map(function(a,i){return ['<b>'+a+'</b>',cell('l'+i)]}))+
+ '<h3 class="h3">Pertanyaan diskusi</h3>'+
+ ta('ld1','1. Apakah struktur teks berita sudah tersusun jelas? Jelaskan.')+
+ ta('ld2','2. Unsur kebahasaan apa yang paling banyak ditemukan?')+
+ ta('ld3','3. Mengapa bahasa baku, objektif, dan lugas penting dalam berita?')+
+ ta('ld4','Kesimpulan kelompok:',3)+
+ '<div class="row">'+goBtn('menulis','Lanjut ke Menulis ✍️')+'</div>');
+
+/* 19. Menulis 1 */
+add('menulis','Menulis','Menulis: Newsroom & Misi 1–2',
+ banner('✍️','Mari Menulis Berita!','Aktual dan akurat')+
+ '<div class="card b"><div class="t">🎯 Tujuan</div><ol><li>Merencanakan penulisan berita dari fakta/hasil liputan.</li><li>Menyusun kerangka (judul, teras, leher, tubuh, kaki).</li><li>Mengembangkan berita aktual, akurat, objektif dengan ADIKSIMBA.</li><li>Menerapkan kaidah kebahasaan berita.</li><li>Menyunting dan memverifikasi draf sebelum dipublikasikan.</li></ol></div>'+
+ '<div class="dark"><b>🏢 Simulasi Ruang Redaksi</b><p style="margin:.3em 0 0">Kamu berperan sebagai <b>Wartawan Lapangan</b> sekaligus <b>Editor</b>. Draf berita tidak pernah langsung terbit; harus lolos verifikasi fakta dan penyuntingan dulu.</p></div>'+
+ '<h3 class="h3">Pertanyaan pemantik</h3>'+
+ ta('n1','1. Mengapa wartawan tidak boleh menambahkan opini pribadi, misalnya “kebakaran ini sangat menyedihkan”?')+
+ ta('n2','2. Apa akibatnya kalau nama narasumber atau jumlah korban salah tulis?')+
+ ta('n3','3. Bagaimana memastikan peristiwa di sekitar sekolahmu layak jadi berita?')+
+ '<h3 class="h3">Misi 1: Perencanaan &amp; Observasi Fakta</h3>'+
+ '<p>Berburu peristiwa yang punya <b>nilai berita</b>: kegiatan OSIS, prestasi siswa, fasilitas baru sekolah, aksi peduli lingkungan, atau isu hangat di komunitasmu.</p>'+
+ '<div class="card"><div class="t" style="font-weight:800">Lembar Kerja 1: Jurnal Observasi</div>'+
+ inp('o1','Topik/peristiwa utama (contoh: Aksi Bank Sampah Siswa SMAN 3 Harapan)')+
+ '<b class="fl">Nilai berita</b><div class="grid2">'+['Kebaruan','Kedekatan','Dampak','Ketokohan','Keluarbiasaan'].map(function(n,i){return ck('o2'+i,n)}).join('')+'</div>'+
+ '<div class="grid2">'+inp('o3','Hari/tanggal')+inp('o4','Waktu')+'</div>'+inp('o5','Lokasi')+
+ '<div class="grid2">'+inp('o6','Narasumber kunci (nama)')+inp('o7','Jabatan/peran')+'</div>'+
+ '<b class="fl">Metode pengumpulan</b>'+ck('o80','Pengamatan langsung')+ck('o81','Wawancara')+ck('o82','Studi dokumen')+'</div>'+
+ '<h3 class="h3">Misi 2: Matriks ADIKSIMBA</h3>'+
+ tbl(['Unsur','Pertanyaan panduan','Catatan fakta &amp; data'],[
+  ['Apa','Peristiwa apa yang terjadi?',cell('x0')],['Siapa','Siapa yang terlibat/jadi narasumber?',cell('x1')],['Di mana','Di mana lokasi tepatnya?',cell('x2')],['Kapan','Kapan waktu spesifiknya?',cell('x3')],['Mengapa','Mengapa peristiwa itu terjadi?',cell('x4')],['Bagaimana','Bagaimana kronologi/prosesnya?',cell('x5')]])+
+ '<div class="row">'+goBtn('menulis2','Misi 3 &amp; 4 ▶')+'</div>');
+
+/* 20. Menulis 2 */
+add('menulis2','Menulis','Misi 3 & 4: Kerangka & Draf',
+ banner('🔻','Misi 3: Kerangka Piramida Terbalik')+
+ '<p>Susun informasi dari matriks ADIKSIMBA, dari yang terpenting hingga pelengkap.</p>'+
+ ta('kr1','1. Judul berita')+ta('kr2','2. Kepala berita (lead)',3)+ta('kr3','3. Leher berita',3)+ta('kr4','4. Tubuh berita',4)+ta('kr5','5. Kaki berita',3)+
+ banner('🛠️','Misi 4: Kembangkan & Perkaya Bahasa')+
+ '<p>Jadikan kerangka tadi satu berita utuh sepanjang <b>3–5 paragraf</b>. Terapkan 6 kaidah ini:</p>'+
+ '<div class="card">'+
+ ck('b1','<b>Bahasa baku</b> sesuai KBBI. Contoh: <i>praktik</i> (bukan praktek), <i>mengubah</i> (bukan merubah).')+
+ ck('b2','<b>Kalimat langsung.</b> Contoh: “Kami berharap kegiatan ini berlanjut,” ujar Ahmad.')+
+ ck('b3','<b>Konjungsi bahwa.</b> Contoh: Kepala sekolah menyatakan bahwa …')+
+ ck('b4','<b>Kata kerja mental.</b> Contoh: menilai, berharap, mengkhawatirkan.')+
+ ck('b5','<b>Keterangan waktu &amp; tempat</b> spesifik. Contoh: di Aula SMAN 3, Senin (19/10/2026).')+
+ ck('b6','<b>Konjungsi temporal.</b> Contoh: sebelumnya, setelah itu, kemudian.')+'</div>'+
+ '<h3 class="h3">Lembar penulisan draf</h3>'+
+ inp('dj','Judul berita')+ta('dd','Draf teks berita',10)+
+ '<div class="row">'+goBtn('menulis3','Misi 5: Peer Editing ▶')+'</div>');
+
+/* 21. Menulis 3 */
+add('menulis3','Menulis','Misi 5: Peer Editing',
+ banner('🧐','Misi 5: Uji Keakuratan & Penyuntingan Sejawat')+
+ '<p>Tukar drafmu dengan teman sebangku. Jadilah <b>Editor Redaksi</b> dan periksa draf temanmu.</p>'+
+ tbl(['Aspek yang diperiksa','Ya','Belum','Catatan editor'],[
+  ['<b>Aktual:</b> peristiwa baru/sedang berlangsung?',ck('pe10',''),ck('pe11',''),cell('pn1')],
+  ['<b>Akurat:</b> nama, gelar, angka, tanggal, lokasi benar tanpa salah eja?',ck('pe20',''),ck('pe21',''),cell('pn2')],
+  ['<b>Objektif:</b> murni fakta tanpa opini/prasangka penulis?',ck('pe30',''),ck('pe31',''),cell('pn3')],
+  ['<b>Judul:</b> mencerminkan isi dan tidak clickbait?',ck('pe40',''),ck('pe41',''),cell('pn4')],
+  ['<b>Struktur:</b> ada kepala, leher, tubuh, kaki?',ck('pe50',''),ck('pe51',''),cell('pn5')],
+  ['<b>Tanda baca:</b> kalimat langsung diakhiri koma sebelum petik tutup?',ck('pe60',''),ck('pe61',''),cell('pn6')]])+
+ '<h3 class="h3">Refleksi menulis</h3>'+
+ ta('rf1','1. Tantangan terbesar saat mengubah fakta wawancara/observasi jadi kalimat berita yang objektif?')+
+ ta('rf2','2. Mengapa memeriksa ulang ejaan nama dan angka (double-check) sangat krusial dalam jurnalisme?')+
+ ta('rf3','3. Bagaimana keterampilan menulis berita yang akurat membantumu saat membagikan informasi di media sosial?')+
+ rubrik('Rubrik Penilaian Menulis',['Aspek','4 (Sangat Baik)','3 (Baik)','2 (Cukup)','1 (Perlu Bimbingan)'],[
+  ['Struktur teks','5 bagian lengkap, piramida terbalik sempurna','4–5 bagian, urutan kurang runtut','Hanya 2–3 bagian','Struktur tidak teridentifikasi'],
+  ['Kelengkapan ADIKSIMBA','Seluruh unsur lengkap, jelas, saling mendukung','4–5 unsur jelas','2–3 unsur','0–1 unsur'],
+  ['Keaktualan &amp; keakuratan','Aktual, data sangat akurat, objektif','Cukup akurat, 1–2 salah kecil','Kurang aktual / data meragukan','Data tidak akurat, banyak opini'],
+  ['Kaidah kebahasaan &amp; PUEBI','Baku, variasi kalimat, tanda baca tepat','1–3 kesalahan','Cukup banyak kesalahan','Tidak menerapkan kaidah']],
+  '<p><b>Nilai akhir = (skor ÷ 16) × 100.</b><br>88–100 Sangat Baik (siap jadi naskah video reporter) · 75–87 Baik · 60–74 Cukup · &lt;60 Perlu tulis ulang</p>')+
+ '<div class="row" style="margin-top:.8em">'+goBtn('berbicara','Lanjut ke Berbicara 🎤')+'</div>');
+
+/* 22. Berbicara 1 */
+add('berbicara','Berbicara','Berbicara: Vlog Berita',
+ banner('🎤','Penyajian Berita dalam Vlog','Waktunya jadi reporter!')+
+ '<div class="card b"><div class="t">🎯 Tujuan</div><ul><li>Memahami struktur dan unsur kebahasaan teks berita.</li><li>Menyusun berita sederhana dengan bahasa yang efektif, jelas, dan sesuai kaidah.</li><li>Bersikap kritis, teliti, kreatif, mandiri, dan bertanggung jawab.</li></ul></div>'+
+ '<h3 class="h3">A. Apa itu vlog berita?</h3>'+
+ '<p>Vlog berita menyajikan informasi dalam <b>video</b> yang memadukan narasi, suara, gambar, rekaman, dan teks/grafis. Meski berbentuk video, isinya harus tetap <b>berdasarkan fakta, jelas, runtut,</b> dan <b>mudah dipahami</b>. Jadi bukan sekadar video menarik, tapi menyampaikan informasi yang benar dan bisa dipertanggungjawabkan.</p>'+
+ mq('Mana yang termasuk <b>vlog berita</b>?',[['“Makanan ini enak dan tempatnya bagus.”',0],['“UMKM tersebut mulai menggunakan media sosial untuk memasarkan produknya dan layanan pemesanan daring untuk menerima pesanan pelanggan.”',1]],'Kalimat kedua. Kalimat pertama hanya pendapat/promosi, sedangkan kalimat kedua berisi informasi yang bisa dikembangkan dengan data, pengamatan, dan wawancara.')+
+ '<h3 class="h3">B. Vlog biasa vs vlog berita</h3>'+
+ tbl(['Vlog biasa / hiburan','Vlog berita'],[
+  ['Bisa berisi pengalaman pribadi','Berisi informasi tentang topik/peristiwa'],
+  ['Lebih menonjolkan hiburan','Menonjolkan penyampaian informasi'],
+  ['Pendapat pribadi bisa dominan','Fakta jadi dasar utama'],
+  ['Tidak selalu pakai narasumber','Dapat melibatkan narasumber'],
+  ['Tujuan utama: menghibur','Tujuan utama: memberi informasi']])+
+ '<h3 class="h3">Ciri-ciri vlog berita</h3>'+
+ '<div>'+['Berisi fakta','Topik jelas','Runtut','Ada gambar pendukung','Audio jelas','Ada presenter &amp; narasumber','Verbal + visual'].map(function(c){return '<span class="chip">'+c+'</span>'}).join('')+'</div>'+
+ '<h3 class="h3">Empat unsur utama</h3>'+
+ acc('🎯 Tema','Topik utama yang jelas, spesifik, dan bernilai informasi.<br>❌ “Kuliner” (terlalu umum)<br>✅ “Strategi UMKM kuliner menggunakan media digital untuk pemasaran”')+
+ acc('💬 Kejelasan informasi','Penonton harus paham: apa yang terjadi/dilakukan, siapa yang terlibat, mengapa dilakukan, dan bagaimana caranya.')+
+ acc('🎥 Kejernihan gambar','Gambar jelas, stabil (tidak terlalu goyang), sesuai informasi, dan membantu menjelaskan berita.')+
+ acc('🔊 Kejelasan audio','Suara presenter dan narasumber terdengar baik; hindari suara yang tertutup bising lingkungan.')+
+ '<div class="row">'+goBtn('vlog2','Lanjut: Inovasi &amp; Proyek ▶')+'</div>');
+
+/* 23. Berbicara 2 */
+add('vlog2','Berbicara','Inovasi, Tema & Tahapan',
+ banner('💡','Inovasi & Go Digital')+
+ '<div class="grid2"><div class="card b" style="margin:0"><div class="t">Go digital</div>Memanfaatkan teknologi digital untuk membantu kegiatan: promosi medsos, jualan online, pemesanan digital, komunikasi pelanggan lewat internet.</div><div class="card o" style="margin:0"><div class="t">Inovasi</div>Perubahan atau pengembangan produk, jasa, atau cara kerja agar sesuai kebutuhan. <b>Tidak selalu digital.</b></div></div>'+
+ mq('Membuat produk baru itu termasuk…',[['Inovasi',1],['Go digital',0]],'Inovasi. Sedangkan menjual produk lewat media sosial termasuk go digital.')+
+ '<h3 class="h3">Pilihan tema liputan</h3>'+
+ '<div>'+['🏞️ Wisata','🍜 Kuliner','🎭 Pertunjukan seni','👗 Fesyen','🧺 Kriya/kerajinan','🌾 Pertanian/agribisnis digital'].map(function(t){return '<span class="chip">'+t+'</span>'}).join('')+'</div>'+
+ '<p>Fokus liputan: cari <b>inovasi atau pemanfaatan teknologi digital</b> pada objek yang dipilih.</p>'+
+ '<h3 class="h3">Pakai 5W+1H untuk liputan</h3>'+
+ '<p>Dipakai untuk mencari informasi, menyusun pertanyaan wawancara, dan menulis naskah.</p>'+
+ tbl(['Unsur','Pertanyaan'],[['What (Apa)','Apa yang terjadi/dilakukan?'],['Who (Siapa)','Siapa yang terlibat?'],['Where (Di mana)','Di mana kegiatan terjadi?'],['When (Kapan)','Kapan dilakukan?'],['Why (Mengapa)','Mengapa dilakukan?'],['How (Bagaimana)','Bagaimana caranya?']])+
+ '<h3 class="h3">Peran dalam kelompok</h3>'+
+ '<ul><li><b>Ketua/Koordinator</b>: mengatur dan membagi tugas.</li><li><b>Penulis naskah</b>: mencari fakta dan menyusun naskah.</li><li><b>Presenter</b>: menyampaikan informasi di depan kamera.</li><li><b>Videografer &amp; editor</b>: merekam dan mengedit video.</li></ul>'+
+ '<h3 class="h3">Tiga pertemuan proyek</h3>'+
+ '<div class="card"><b>Pertemuan 1 · Perencanaan</b><br>Memahami vlog berita → bentuk kelompok → pilih tema → tentukan objek → bagi tugas.</div>'+
+ '<div class="card"><b>Pertemuan 2 · Penyusunan</b><br>Susun pertanyaan wawancara → buat naskah → tentukan narasumber dan lokasi.</div>'+
+ '<div class="card"><b>Pertemuan 3 · Produksi</b><br>Ambil gambar → wawancara → editing → periksa video → tayangkan hasil.</div>'+
+ '<div class="row">'+goBtn('vlog3','Isi LKPD Kerangka Vlog ▶')+'</div>');
+
+/* 24. LKPD Vlog */
+add('vlog3','Berbicara','LKPD Kerangka Vlog',
+ banner('🎬','LKPD: Kerangka Ide Konten Vlog Berita')+
+ '<h3 class="h3" style="margin-top:.3em">A. Identitas &amp; peran kelompok (6 orang)</h3>'+
+ tbl(['Peran','Nama anggota'],['Ketua/Koordinator Proyek','Penulis Naskah','Presenter/Pembawa Vlog (1)','Presenter/Pembawa Vlog (2)','Videografer &amp; Editor (1)','Videografer &amp; Editor (2)'].map(function(r,i){return [r,'<input type="text" data-save="vp'+i+'" aria-label="'+r+'">']}))+
+ '<h3 class="h3">B. Pilih satu tema</h3><div class="card">'+
+ [['Wisata','objek wisata yang berinovasi digital: promosi medsos, tiket/reservasi daring, tur virtual.'],['Kuliner','UMKM makanan/minuman go digital: aplikasi ojek daring/e-commerce, promosi medsos, pemesanan digital.'],['Pertunjukan seni','pelaku seni yang tampil secara digital: live streaming atau promosi karya.'],['Fesyen','produsen/desainer (mis. batik/tenun) yang memasarkan lewat e-commerce, medsos, live shopping.'],['Kriya/kerajinan','perajin yang berinovasi produk atau memasarkan digital.'],['Pertanian/agribisnis digital','petani/kelompok tani yang menjual hasil panen lewat platform digital atau teknologi pertanian pintar.']].map(function(t,i){return ck('tema'+i,'<b>'+t[0]+'</b>: '+t[1])}).join('')+'<small>Contoh arah ide, bukan batasan. Boleh mengembangkan ide sejenis.</small></div>'+
+ '<h3 class="h3">C. Objek / pelaku usaha</h3>'+
+ inp('ob1','Nama usaha/objek/tokoh')+inp('ob2','Lokasi')+ta('ob3','Alasan memilih objek ini (mengapa menarik sebagai contoh inovasi/go digital?)')+
+ '<h3 class="h3">D. Judul sementara vlog</h3>'+inp('jv','Judul sementara')+
+ '<h3 class="h3">E. Kerangka 5W+1H</h3>'+
+ ta('v5a','<b>Apa:</b> inovasi/bentuk go digital apa yang dilakukan?')+
+ ta('v5b','<b>Siapa:</b> pelaku usaha/tokoh/pihak yang terlibat?')+
+ ta('v5c','<b>Kapan/Bagaimana:</b> kapan dan bagaimana proses inovasi mulai dilakukan?')+
+ ta('v5d','<b>Di mana:</b> lokasi usaha/kegiatan?')+
+ ta('v5e','<b>Mengapa:</b> mengapa inovasi/go digital ini penting?')+
+ ta('v5f','<b>Dampak/manfaat:</b> apa yang dirasakan setelah inovasi?')+
+ '<h3 class="h3">F. Rencana visual</h3>'+
+ tbl(['No.','Gambar/adegan yang diambil','Lokasi/keterangan'],[1,2,3,4].map(function(n){return [n,cell('vs'+n+'a',1),cell('vs'+n+'b',1)]}))+
+ '<h3 class="h3">G. Rencana audio/narasi</h3>'+ta('va','Apa yang disampaikan lewat narasi presenter dan/atau wawancara narasumber?',4)+
+ '<h3 class="h3">H. Rencana pertemuan berikutnya</h3>'+
+ tbl(['Pertemuan','Fokus kegiatan'],[['2','Menyusun naskah/narasi dan storyboard, merinci tugas teknis tiap peran'],['3','Pengambilan gambar (syuting), editing, dan presentasi/pemutaran hasil vlog']])+
+ ta('vp9','Persiapan yang perlu dibawa/disiapkan:')+
+ '<div class="card o"><div class="t">📝 Catatan guru</div>Kolom ini diisi guru sebagai umpan balik atas kerangka ide kontenmu.</div>'+
+ '<div class="row">'+goBtn('kuis','Uji kemampuan: Kuis 🧠')+'</div>');
+
+/* 25. Kuis */
+var Q=[
+ {q:'<div class="qtext">Berita A: kegiatan penghijauan di Kota Batu dilaksanakan 7 September 2026 dan diberitakan hari yang sama.<br>Berita B: kegiatan yang sama, tetapi baru diberitakan 20 September 2026.</div>Jika kedua berita membahas peristiwa yang sama dan sama benarnya, kesimpulan paling tepat adalah ….',o:['Berita B lebih aktual karena informasinya lebih lengkap','Berita A lebih aktual karena waktu publikasinya lebih dekat dengan peristiwa','Berita A lebih akurat karena diterbitkan lebih cepat','Berita B lebih akurat karena jarak waktu publikasinya lebih panjang'],a:1,e:'Keaktualan diukur dari dekatnya waktu publikasi dengan peristiwa. Kecepatan terbit tidak menentukan keakuratan.'},
+ {q:'Sebuah akun media sosial mengunggah informasi tentang fenomena alam tak biasa di Kota Batu. Unggahan dibuat lima menit lalu, tetapi tanpa sumber, data, narasumber, atau bukti. Penilaian paling tepat ….',o:['Pasti akurat karena baru dipublikasikan','Tidak aktual karena belum diberitakan media massa','Aktual, tetapi keakuratannya masih perlu diperiksa','Akurat karena sudah tersebar luas di media sosial'],a:2,e:'Baru diunggah berarti aktual, tetapi tanpa sumber dan bukti keakuratannya belum terjamin. Viral ≠ benar.'},
+ {q:'<div class="qtext">“Sebanyak 72 anggota Paskibraka Kota Batu Tahun 2026 resmi purnatugas setelah melaksanakan tugas dalam rangkaian peringatan kemerdekaan.”</div>Jika kutipan itu dipakai untuk menilai keakuratan berita, unsur yang paling perlu dicari adalah ….',o:['Judul berita','Sumber dan narasumber yang mendukung data tersebut','Kata sifat yang digunakan penulis','Panjang pendeknya berita'],a:1,e:'Data angka (72 anggota) harus didukung sumber dan narasumber agar bisa dicek kebenarannya.'},
+ {q:'Seorang siswa membaca berita bahwa kegiatan di Kota Batu diikuti 500 peserta. Berita lain dari sumber berbeda menyebut 350 orang. Keduanya terbit pada hari yang sama. Tindakan paling tepat siswa ….',o:['Memilih angka 500 karena lebih besar','Memilih berita dengan judul paling menarik','Melakukan cek silang terhadap sumber dan narasumber kedua berita','Menganggap kedua berita tidak aktual karena datanya berbeda'],a:2,e:'Data yang berbeda diselesaikan dengan cek silang sumber dan narasumber, bukan menebak.'},
+ {q:'<div class="qtext">Wisatawan asal Rusia, Aleksandr Popov (35), tersangkut di pohon pinus setinggi sekitar 20 meter di Desa Gunungsari, Kecamatan Bumiaji, Kota Batu, Jawa Timur, Selasa (25/8/2026).</div>Alasan paling tepat kalimat itu disebut kepala berita adalah ….',o:['Memberikan pendapat penulis tentang peristiwa','Menyajikan informasi paling penting: apa, siapa, kapan, dan di mana','Menjelaskan seluruh kronologi secara rinci','Hanya memberi informasi tambahan setelah peristiwa selesai'],a:1,e:'Kepala berita memuat inti: apa, siapa, di mana, kapan.'},
+ {q:'Jika kalimat pada soal nomor 5 dikembangkan menjadi paragraf yang menjelaskan proses penyelamatan, penyebab korban tersangkut, lama evakuasi, serta keterangan tim SAR, bagian itu termasuk ….',o:['Judul','Kepala berita','Tubuh berita','Kaki berita'],a:2,e:'Kronologi, sebab, proses, dan kutipan narasumber adalah isi tubuh berita.'},
+ {q:'Perhatikan bagian berikut:<br>1. Informasi tambahan tentang kondisi korban setelah dievakuasi<br>2. Peristiwa utama dan identitas orang yang terlibat<br>3. Judul yang menggambarkan inti peristiwa<br>4. Kronologi dan keterangan narasumber<br>5. Konteks/informasi tambahan mengenai awal kejadian<br>Urutan struktur berita yang paling tepat ….',o:['3–2–5–4–1','2–3–5–1–4','3–5–2–4–1','2–5–3–4–1'],a:0,e:'Judul (3) → kepala (2) → leher (5) → tubuh (4) → kaki (1).'},
+ {q:'<div class="qtext">Aleksandr mengalami insiden tersebut setelah melakukan aktivitas paralayang dari kawasan Gunung Banyak, Desa Songgokerto, Kota Batu, pada Selasa sore.</div>Kutipan itu termasuk leher berita karena ….',o:['berisi informasi tambahan yang memberi konteks setelah informasi utama','merupakan informasi paling penting yang harus di awal berita','berisi kesimpulan dari seluruh peristiwa','hanya berfungsi sebagai judul berita'],a:0,e:'Leher berita menjembatani kepala dan tubuh dengan memberi konteks tambahan.'},
+ {q:'Sebuah berita berstruktur lengkap. Bagian akhirnya hanya menjelaskan bahwa setelah dievakuasi, korban diserahkan kepada pihak keluarga. Jika dihapus, inti peristiwa tetap dapat dipahami. Bagian itu adalah ….',o:['Kepala berita','Leher berita','Tubuh berita','Kaki berita'],a:3,e:'Kaki berita berisi informasi pelengkap yang boleh dipotong tanpa merusak pemahaman.'},
+ {q:'<div class="qtext">Tim SAR menerima laporan mengenai wisatawan asing yang tersangkut di pohon. Tim kemudian melakukan asesmen dan mengevakuasi korban menggunakan metode lowering dengan sistem tali dan perangkat keselamatan.</div>Informasi ini paling kuat untuk menjawab unsur ….',o:['What','Why','How','When'],a:2,e:'Menjelaskan cara/proses penyelamatan = unsur How (bagaimana).'},
+ {q:'<div class="qtext">Proses evakuasi berlangsung sekitar dua jam karena kondisi medan yang sulit.</div>Dikaitkan dengan 5W+1H, informasi itu terutama menunjukkan ….',o:['kapan dan mengapa','siapa dan di mana','apa dan siapa','di mana dan bagaimana'],a:0,e:'“Sekitar dua jam” = waktu/durasi (When); “karena medan sulit” = sebab (Why).'},
+ {q:'Seorang siswa menemukan berita yang sudah menjelaskan apa, siapa, kapan, dan di mana, tetapi tidak menjelaskan penyebab peristiwa. Kelemahan berita itu ….',o:['unsur What belum lengkap','unsur Who belum lengkap','unsur Why belum ditemukan','unsur How sudah tidak diperlukan'],a:2,e:'Penyebab peristiwa dijawab oleh unsur Why (mengapa).'},
+ {q:'<div class="qtext">Tim SAR melakukan evakuasi terhadap korban di Desa Gunungsari dengan hati-hati.</div>Kata <i>melakukan</i> dan frasa <i>dengan hati-hati</i> secara berurutan merupakan ….',o:['kata kerja dan keterangan cara','kata baku dan keterangan waktu','konjungsi dan keterangan tempat','kata kerja dan keterangan tempat'],a:0,e:'“Melakukan” = kata kerja; “dengan hati-hati” menerangkan cara.'},
+ {q:'<div class="qtext">Korban mengalami masalah sehingga tersangkut di pohon.</div>Fungsi kata <i>sehingga</i> dalam kalimat itu ….',o:['menunjukkan tempat terjadinya peristiwa','menghubungkan informasi yang menunjukkan hubungan antarkejadian','menjelaskan identitas narasumber','menunjukkan waktu terjadinya peristiwa'],a:1,e:'“Sehingga” adalah konjungsi yang menghubungkan sebab-akibat antarkejadian.'},
+ {q:'Kalimat yang paling sesuai dengan prinsip objektif dalam penulisan berita adalah ….',o:['Tim SAR yang luar biasa hebat itu berhasil menyelamatkan korban dengan sangat mengagumkan.','Beruntung sekali korban mendapatkan pertolongan dari tim SAR terbaik di Kota Batu.','Tim SAR berhasil mengevakuasi korban dalam kondisi selamat.','Korban pasti merasa sangat bahagia karena diselamatkan oleh tim SAR.'],a:2,e:'Hanya opsi C yang murni fakta, tanpa pujian, penilaian, atau dugaan perasaan.'},
+ {q:'Seorang siswa mengubah <i>“Korban berhasil dievakuasi,” kata petugas.</i> menjadi <i>Petugas mengatakan bahwa korban berhasil dievakuasi.</i> Perubahan itu menunjukkan siswa telah mengubah ….',o:['kalimat baku menjadi tidak baku','kalimat langsung menjadi kalimat tidak langsung','kalimat objektif menjadi subjektif','kalimat aktif menjadi kalimat berita'],a:1,e:'Tanda petik dihilangkan dan dipakai konjungsi “bahwa” → kalimat tidak langsung.'},
+ {q:'Kalimat 1: Aktifitas evakuasi dilakukan oleh tim SAR selama dua jam.<br>Kalimat 2: Aktivitas evakuasi dilakukan oleh tim SAR selama dua jam.<br>Jika berita harus memakai kaidah bahasa Indonesia, perbaikan yang tepat ….',o:['Kalimat 1 karena lebih umum dipakai masyarakat','Kalimat 2 karena memakai bentuk kata baku','Kalimat 1 karena lebih singkat','Kedua kalimat sama-sama tepat'],a:1,e:'Bentuk baku menurut KBBI adalah “aktivitas”, bukan “aktifitas”.'},
+ {q:'<div class="qtext"><b>Warga Kota Batu Temukan Cara Baru Mengolah Sampah</b><br>Sejumlah warga menemukan metode baru untuk mengolah sampah rumah tangga … Kegiatan dilakukan pada Senin, 7 September 2026. Menurut koordinator kegiatan, metode tersebut masih dalam tahap pengembangan. Warga berharap metode itu dapat diterapkan lebih luas setelah pengujian lebih lanjut.</div>Untuk mengetahui siapa yang memberi informasi bahwa metode masih dalam pengembangan, bagian yang diperhatikan adalah ….',o:['Judul','Kutipan atau keterangan narasumber','Keterangan tempat','Kata kerja dalam berita'],a:1,e:'Siapa yang menyampaikan informasi (atribusi) terlihat dari keterangan narasumber.'},
+ {q:'Seorang siswa menilai apakah berita dapat dipercaya: (1) membaca judul, (2) memeriksa penerbit, (3) memeriksa tanggal publikasi, (4) memeriksa data dan fakta, (5) mencari sumber lain sebagai pembanding. Langkah itu paling tepat menunjukkan ….',o:['proses menentukan struktur berita','proses menemukan unsur kebahasaan','proses mengecek keakuratan berita','proses menentukan judul berita'],a:2,e:'Memeriksa sumber, tanggal, data, dan membandingkan adalah proses cek akurasi/verifikasi.'},
+ {q:'Berita X terbit 8 September 2026 dan melaporkan peristiwa hari yang sama. Berita itu mencantumkan nama narasumber, data jumlah peserta, lokasi, waktu kejadian, dan bisa dibandingkan dengan laporan media lain yang serupa. Kesimpulan paling tepat ….',o:['Berita X hanya dapat disebut aktual karena terbit hari yang sama','Berita X hanya dapat disebut akurat karena punya narasumber','Berita X menunjukkan ciri aktual dan memiliki unsur pendukung keakuratan','Berita X tidak dapat dipercaya karena memakai data angka'],a:2,e:'Terbit di hari kejadian = aktual; narasumber, data, dan pembanding = pendukung akurasi.'},
+ {q:'Teks berita masa kini sering disajikan secara multimodal dalam bentuk vlog. Keunggulan utama vlog dibandingkan berita cetak biasa adalah ….',o:['Penonton tidak perlu memikirkan 5W+1H karena digantikan gambar','Penonton dapat melihat langsung situasi peristiwa lewat visual dan audio yang nyata','Pembuat berita bebas beropini tanpa riset fakta','Vlog tidak memerlukan naskah maupun penyuntingan'],a:1,e:'Kekuatan vlog: gabungan visual dan audio yang menampilkan situasi langsung.'},
+ {q:'Seorang siswa merekam vlog liputan pameran seni di alun-alun Kota Batu. Saat ditonton ulang, penjelasannya tak terdengar jelas karena tertutup suara kendaraan. Siswa itu mengabaikan faktor ….',o:['Pemilihan tema yang menarik dan relevan','Penggunaan gambar visual yang proporsional dan stabil','Penggunaan audio yang jelas dan jernih','Penampilan fisik dan pencahayaan lokasi syuting'],a:2,e:'Masalahnya ada pada kejelasan audio.'},
+ {q:'Meskipun berformat video kekinian, naravlog berita tetap menjaga profesionalisme jurnalistik. Cara berkomunikasi yang paling tepat ….',o:['Memakai bahasa gaul agar terasa seperti mengobrol dengan teman','Memakai bahasa baku dengan intonasi dan artikulasi yang jelas','Berbicara sangat cepat agar durasi video singkat','Memakai bahasa daerah secara dominan agar unik'],a:1,e:'Bahasa baku, intonasi, dan artikulasi jelas menjaga kejelasan dan kredibilitas.'},
+ {q:'Sebuah vlog berita meliput jalanan rusak di sebuah desa, tetapi gambarnya sangat buram, kamera sering bergoyang, dan tidak fokus pada objek jalan. Dampak paling mungkin bagi penonton ….',o:['Penonton lebih fokus mendengarkan suara pembawa berita','Penonton menganggap video dramatis dan artistik','Penonton tetap mendapat kelengkapan 5W+1H secara utuh','Penonton kesulitan memahami konteks lokasi dan merasa pusing atau tidak nyaman'],a:3,e:'Gambar buram dan goyang menyulitkan pemahaman serta membuat tidak nyaman.'},
+ {q:'Langkah pertama sebelum memproduksi vlog berita adalah menentukan tema. Tema yang layak dipublikasikan sebaiknya ….',o:['Mengandung informasi faktual yang bermanfaat sekaligus mengedukasi masyarakat','Berisi opini atau asumsi pribadi untuk memicu perdebatan','Membahas gosip tokoh publik yang viral walau belum terbukti','Menceritakan keseharian pembuat video yang tak terkait kepentingan publik'],a:0,e:'Tema vlog berita harus faktual, bermanfaat, dan mengedukasi.'}
+];
+var QS={i:0,score:0,ans:null,done:false,started:false};
+function renderQuiz(){
+  var el=document.getElementById('quizBox'); if(!el) return;
+  if(!QS.started){
+    el.innerHTML='<div class="dark"><b>Siap uji kemampuan?</b><p style="margin:.3em 0 0">25 soal pilihan ganda tentang teks berita &amp; vlog. Tiap soal langsung ada pembahasan. Santai saja, ini buat latihan!</p></div><button class="btn red" data-act="qstart">MULAI KUIS</button>'; return;
+  }
+  if(QS.done){
+    var n=Math.round(QS.score/Q.length*100), k=n>=88?'Sangat Baik 🏆':n>=75?'Baik 👍':n>=60?'Cukup 🙂':'Perlu belajar lagi 💪';
+    el.innerHTML='<div class="score"><div>Skor kamu</div><div class="n">'+n+'</div><p><b>'+QS.score+' / '+Q.length+' benar</b><br>'+k+'</p></div><div class="row" style="justify-content:center"><button class="btn" data-act="qretry">Ulangi kuis</button><button class="btn ghost" data-go="definisi">Baca materi lagi</button></div>'; return;
+  }
+  var q=Q[QS.i], L='ABCD';
+  el.innerHTML='<div class="qno">Soal '+(QS.i+1)+' dari '+Q.length+'</div><div class="qbar"><i style="width:'+(QS.i/Q.length*100)+'%"></i></div><div class="mq"><p>'+q.q+'</p>'+
+   q.o.map(function(o,j){return '<button class="opt" data-act="qans" data-j="'+j+'"><b>'+L[j]+'.</b> '+o+'</button>'}).join('')+'<div class="fb" id="qfb"></div></div><div class="row"><button class="btn" id="qnext" data-act="qnext" style="display:none">'+(QS.i===Q.length-1?'Lihat skor':'Soal berikutnya ▶')+'</button></div>';
+}
+add('kuis','Kuis','Kuis: Ujian Harian',
+ banner('🧠','Kuis Teks Berita & Vlog','Ujian harian · 25 soal')+'<div id="quizBox"></div>');
+
+/* 26. Penutup */
+add('penutup','Penutup','Penutup & Daftar Pustaka',
+ banner('🏁','Kerja Bagus, Reporter!')+
+ '<p>Kamu sudah menjelajahi teks berita dari menyimak, membaca, menulis, sampai berbicara. Sekarang saatnya mewujudkan <b>video reporter</b> buatan kelompokmu. Ingat selalu: <b>aktual, akurat, objektif, dan verifikasi sebelum membagikan!</b></p>'+
+ '<h3 class="h3">Video pembelajaran (YouTube)</h3>'+
+ vid('Teks Berita 2: Struktur dan Kaidah Kebahasaan Teks Berita','https://www.youtube.com/watch?v=C8zSCWNAhes')+
+ vid('Struktur dan Kaidah Kebahasaan Teks Berita (Rumah Belajar)','https://www.youtube.com/watch?v=RirjRNj8a-4')+
+ vid('Menentukan Informasi Aktual dan Akurat dalam Teks Berita','https://www.youtube.com/watch?v=djM9_WUmIIs')+
+ vid('Kenali Ciri-ciri Hoaks di Ruang Digital | Cek Fakta','https://www.youtube.com/watch?v=uGpD8letpP0')+
+ vid('Menyimak Misi 1: Berita Wisata','https://youtu.be/0xQfihAsggA?si=K-uJAKN07oW0LfJe','', 'Menyimak')+
+ vid('Menyimak Misi 2: Berita Bencana','https://youtu.be/hJIlzdaEmGo?si=ENbPNihetp9M6-JZ','', 'Menyimak')+
+ '<h3 class="h3">Daftar pustaka</h3>'+
+ '<ul style="font-size:.88em"><li>Jannaini, F., &amp; Tamsin, A. C. (2024). Analisis struktur, unsur, dan kaidah kebahasaan teks berita siswa kelas VII SMP Negeri 2 Payakumbuh. <i>Jurnal Pendidikan Tambusai, 8</i>(2), 27978–27987.</li>'+
+ '<li>Juditha, C. (2013). Akurasi berita dalam jurnalisme online (Kasus dugaan korupsi Mahkamah Konstitusi di portal berita Detiknews). <i>Jurnal Pekommas, 16</i>(3), 145–154.</li>'+
+ '<li>Widiyawati, W. (t.t.). Akurasi dan objektivitas berita media online (Studi di Solopos.com, 19–25 September 2016). <i>Jurnal Komunitas</i>, 93–105. Universitas Sahid Surakarta.</li>'+
+ '<li>RRI.co.id. (2026, 6 September). MBATU SAE Cup BFL 2026 lahirkan juara futsal pelajar.</li></ul>'+
+ '<div class="row" style="margin-top:1em"><button class="btn ghost sm" data-act="reset">Hapus semua jawabanku</button><button class="btn sm" data-go="cover">Kembali ke sampul</button></div>');
+
+/* ===== Mesin tampilan ===== */
+var cur=0, $s=document.getElementById('scroll');
+function esc(s){return s}
+function toast(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(function(){t.classList.remove('show')},1400); }
+function restore(){
+  $s.querySelectorAll('[data-save]').forEach(function(el){
+    var v=state[el.getAttribute('data-save')];
+    if(v===undefined) return;
+    if(el.type==='checkbox') el.checked=!!v; else el.value=v;
+  });
+}
+function show(i,keep){
+  cur=Math.max(0,Math.min(P.length-1,i));
+  var p=P[cur];
+  $s.innerHTML='<div class="pg">'+p.html+'</div>';
+  restore();
+  if(p.id==='kuis') renderQuiz();
+  if(!keep) $s.scrollTop=0;
+  document.getElementById('prog').style.width=((cur+1)/P.length*100)+'%';
+  document.getElementById('mid').textContent=(cur+1)+' / '+P.length+' · '+p.title;
+  document.getElementById('prev').disabled=cur===0;
+  document.getElementById('next').disabled=cur===P.length-1;
+  try{ history.replaceState(null,'','#'+p.id); }catch(e){}
+  buildMenu();
+}
+function goId(id){ for(var i=0;i<P.length;i++) if(P[i].id===id){ show(i); return; } }
+function buildMenu(){
+  var h='',g='';
+  P.forEach(function(p,i){ if(p.grp!==g){ g=p.grp; h+='<div class="grp">'+g+'</div>'; } h+='<button data-i="'+i+'" class="'+(i===cur?'cur':'')+'"><span>'+(i+1)+'.</span><span>'+p.title+'</span></button>'; });
+  document.getElementById('lst').innerHTML=h;
+}
+var PY=[
+ ['Judul','Menarik perhatian sekaligus mewakili isi. Singkat, padat, jelas (sekitar 3–8 kata). Judul berlebihan atau tak sesuai isi menurunkan kepercayaan pembaca.'],
+ ['Kepala berita (teras)','Memuat inti peristiwa: apa, siapa, di mana, kapan. Biasanya satu kalimat ringkas, sekitar 20–35 kata.'],
+ ['Leher berita','Jembatan antara teras dan tubuh berita. Mengembangkan dan menguatkan kepala berita dengan keterangan tambahan.'],
+ ['Tubuh berita','Memuat kronologi, latar belakang, dan kutipan narasumber; menjawab mengapa dan bagaimana. Disusun berurutan menurut waktu.'],
+ ['Kaki berita','Keterangan pelengkap yang tetap berguna, tetapi tidak merusak pemahaman bila dihilangkan. Boleh dipotong jika ruang terbatas.']];
+
+document.addEventListener('click',function(e){
+  var t=e.target.closest('[data-go],[data-act],#prev,#next,#menuBtn,#closeMenu,#lst button');
+  if(!t) return;
+  if(t.id==='prev') return show(cur-1);
+  if(t.id==='next') return show(cur+1);
+  if(t.id==='menuBtn'){ document.getElementById('drawer').classList.add('open'); return; }
+  if(t.id==='closeMenu'){ document.getElementById('drawer').classList.remove('open'); return; }
+  if(t.closest('#lst')){ document.getElementById('drawer').classList.remove('open'); return show(+t.getAttribute('data-i')); }
+  if(t.hasAttribute('data-go')) return goId(t.getAttribute('data-go'));
+  var a=t.getAttribute('data-act');
+  if(a==='acc'){ var b=t.parentNode; b.classList.toggle('open'); t.setAttribute('aria-expanded',b.classList.contains('open')); }
+  else if(a==='flip'){ t.classList.toggle('open'); }
+  else if(a==='rev'){ t.nextElementSibling.classList.toggle('show'); }
+  else if(a==='hl'){ var k=t.getAttribute('data-k'); document.querySelectorAll('.hl-'+k).forEach(function(x){x.classList.toggle('on')}); }
+  else if(a==='pyr'){
+    var i=+t.getAttribute('data-i'); document.querySelectorAll('#pyr button').forEach(function(b){b.classList.remove('on')}); t.classList.add('on');
+    document.getElementById('pinfo').innerHTML='<div class="t">'+PY[i][0]+'</div>'+PY[i][1];
+  }
+  else if(a==='mq'){
+    var box=t.closest('.mq'); var ok=t.getAttribute('data-c')==='1';
+    box.querySelectorAll('.opt').forEach(function(b){ b.disabled=true; if(b.getAttribute('data-c')==='1') b.classList.add('ok'); });
+    if(!ok) t.classList.add('no');
+    var fb=box.querySelector('.fb'); fb.classList.add('show'); fb.innerHTML=(ok?'✅ <b>Tepat!</b> ':'❌ <b>Belum tepat.</b> ')+box.getAttribute('data-exp');
+  }
+  else if(a==='qstart'){ QS={i:0,score:0,ans:null,done:false,started:true}; renderQuiz(); }
+  else if(a==='qretry'){ QS={i:0,score:0,ans:null,done:false,started:true}; renderQuiz(); $s.scrollTop=0; }
+  else if(a==='qans'){
+    var j=+t.getAttribute('data-j'), q=Q[QS.i], ok2=j===q.a;
+    if(ok2) QS.score++;
+    document.querySelectorAll('#quizBox .opt').forEach(function(b,x){ b.disabled=true; if(x===q.a) b.classList.add('ok'); });
+    if(!ok2) t.classList.add('no');
+    var f=document.getElementById('qfb'); f.classList.add('show'); f.innerHTML=(ok2?'✅ <b>Benar!</b> ':'❌ <b>Kurang tepat.</b> Jawaban: <b>'+'ABCD'[q.a]+'</b>. ')+q.e;
+    document.getElementById('qnext').style.display='inline-block';
+  }
+  else if(a==='qnext'){ if(QS.i===Q.length-1) QS.done=true; else QS.i++; renderQuiz(); $s.scrollTop=0; }
+  else if(a==='reset'){ if(confirm('Hapus semua jawaban yang sudah kamu isi?')){ state={}; persist(); show(cur,true); toast('Jawaban dihapus'); } }
+});
+document.addEventListener('input',function(e){
+  var el=e.target; if(!el.hasAttribute||!el.hasAttribute('data-save')) return;
+  state[el.getAttribute('data-save')]=el.type==='checkbox'?el.checked:el.value;
+  clearTimeout(document._st); document._st=setTimeout(function(){persist();toast('Jawabanmu tersimpan ✓')},500);
+});
+document.addEventListener('keydown',function(e){
+  if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowRight') show(cur+1); else if(e.key==='ArrowLeft') show(cur-1); else if(e.key==='Escape') document.getElementById('drawer').classList.remove('open');
+});
+var start=0, h=(location.hash||'').replace('#','');
+for(var i=0;i<P.length;i++) if(P[i].id===h) start=i;
+show(start);
+</script>
+</body>
+</html>
